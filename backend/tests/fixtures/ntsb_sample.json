@@ -1,0 +1,42 @@
+[
+  {
+    "NtsbNumber": "CEN24LA123",
+    "EventType": "Accident",
+    "EventDate": "2024-03-14T18:42:00Z",
+    "Mode": "Aviation",
+    "City": "Georgetown",
+    "State": "TX",
+    "Country": "United States",
+    "Latitude": 30.6333,
+    "Longitude": -97.6772,
+    "AirportId": "KGTU",
+    "AirportName": "Georgetown Municipal Airport",
+    "AircraftMake": "Cessna",
+    "AircraftModel": "172S",
+    "AircraftDamage": "Substantial",
+    "InjurySeverity": "Minor",
+    "HighestInjuryLevel": "Minor",
+    "NarrativeBrief": "During landing rollout, the airplane departed the runway surface and the nose landing gear collapsed. The pilot reported a gust of crosswind at touchdown.",
+    "ReportUrl": "https://www.ntsb.gov/investigations/AccidentReports/Pages/CEN24LA123.aspx"
+  },
+  {
+    "NtsbNumber": "ERA24FA089",
+    "EventType": "Accident",
+    "EventDate": "2024-01-02T15:10:00Z",
+    "Mode": "Aviation",
+    "City": "Ocala",
+    "State": "FL",
+    "Country": "United States",
+    "Latitude": 29.1727,
+    "Longitude": -82.2243,
+    "AirportId": "KOCF",
+    "AirportName": "Ocala International Airport",
+    "AircraftMake": "Piper",
+    "AircraftModel": "PA-28-181",
+    "AircraftDamage": "Destroyed",
+    "InjurySeverity": "Fatal",
+    "HighestInjuryLevel": "Fatal",
+    "NarrativeBrief": "The airplane impacted terrain shortly after departure. Preliminary information indicates a loss of engine power.",
+    "ReportUrl": "https://www.ntsb.gov/investigations/AccidentReports/Pages/ERA24FA089.aspx"
+  }
+]

@@ -1,0 +1,36 @@
+# Env
+.env
+.env.local
+.env.production
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+backend/*.db
+
+# Node
+node_modules/
+dist/
+.vite/
+test-results/
+playwright-report/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+tfplan*
+
+# Claude Code local settings (personal, not shared)
+.claude/settings.local.json
+
+# OS
+.DS_Store

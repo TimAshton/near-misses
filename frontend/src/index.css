@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: #0b0f14;
+  color: #e5e7eb;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Large-screen only app (min-width: 1024px per spec) */
+.mapboxgl-popup-content {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}

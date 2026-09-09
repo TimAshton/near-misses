@@ -1,0 +1,39 @@
+import { PageShell } from "../components/layout/PageShell";
+
+export function About() {
+  return (
+    <PageShell title="About">
+      <div className="max-w-2xl space-y-6 text-sm text-gray-300">
+        <section>
+          <h2 className="mb-1 text-base font-semibold text-gray-100">Project</h2>
+          <p>
+            US Incident Map overlays publicly available US incident data — aviation, rail,
+            seismic, tsunami, and hurricane — onto an interactive map. Data is polled from free
+            public APIs, normalized to a shared schema, and stored persistently. No authentication
+            is required to view the site.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-1 text-base font-semibold text-gray-100">Data sources &amp; attribution</h2>
+          <p>
+            Phase 1 (Aviation) sources incident records from the NTSB accident/incident database,
+            with FAA data incorporated where it is publicly accessible. All raw source records are
+            retained for auditing and can be viewed on each incident's detail page.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mb-1 text-base font-semibold text-gray-100">Refresh cadence &amp; data lag</h2>
+          <p>
+            The system polls source APIs automatically every 5 minutes, and a manual refresh is
+            available from the Dashboard. Note that some sources publish incident data only after
+            an investigation concludes, which can lag the real-world event by days to months —
+            the 5-minute poll interval reflects how quickly newly published records are picked up,
+            not how quickly incidents occurred.
+          </p>
+        </section>
+      </div>
+    </PageShell>
+  );
+}
