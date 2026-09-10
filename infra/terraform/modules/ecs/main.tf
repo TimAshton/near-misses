@@ -65,6 +65,13 @@ resource "aws_ecs_task_definition" "api" {
       name      = "api"
       image     = "${var.ecr_repository_url}:${var.image_tag}"
       essential = true
+      # Default (30s) gives the in-process scheduler's already-running poll
+      # cycle time to finish and commit with the OLD code during a
+      # deployment, after the NEW task is already serving traffic — a race
+      # that has repeatedly reintroduced stale/unfiltered rows right after a
+      # deploy. A short stopTimeout kills the old container before an
+      # in-flight poll (observed to take ~10-30s) can complete.
+      stopTimeout = 5
       portMappings = [
         {
           containerPort = var.container_port
