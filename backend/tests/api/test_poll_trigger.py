@@ -274,8 +274,10 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
     body = response.json()
     assert body["fetched"] == 11
     assert body["new_incidents"] == 6
-    assert body["rejected_non_us"] == 4
-    assert body["below_min_severity"] == 1
+    # The non-US wildfire fixture is medium severity, so it's caught by the
+    # wildfire critical-only policy before the US-bounds check ever runs.
+    assert body["rejected_non_us"] == 3
+    assert body["below_min_severity"] == 2
 
     incidents = client.get("/api/incidents").json()
     categories = {i["category"] for i in incidents["items"]}

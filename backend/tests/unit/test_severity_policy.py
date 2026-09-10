@@ -12,6 +12,13 @@ def test_rail_and_seismic_require_medium_or_higher():
     assert meets_minimum_severity(Category.seismic, Severity.medium)
 
 
+def test_wildfire_requires_critical():
+    assert not meets_minimum_severity(Category.wildfire, Severity.low)
+    assert not meets_minimum_severity(Category.wildfire, Severity.medium)
+    assert not meets_minimum_severity(Category.wildfire, Severity.high)
+    assert meets_minimum_severity(Category.wildfire, Severity.critical)
+
+
 def test_categories_without_a_policy_allow_every_severity():
     assert meets_minimum_severity(Category.aviation, Severity.low)
     assert meets_minimum_severity(Category.tsunami, Severity.low)
