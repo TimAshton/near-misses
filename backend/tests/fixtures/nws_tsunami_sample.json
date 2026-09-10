@@ -19,7 +19,8 @@
         "urgency": "Immediate",
         "event": "Tsunami Warning",
         "headline": "Tsunami Warning issued for the Alaska coast",
-        "description": "A tsunami warning is in effect following a magnitude 7.8 earthquake. Widespread inundation of coastal areas is possible. Move to high ground immediately.",
+        "description": "A tsunami warning is in effect following a magnitude 7.8 earthquake. Widespread inundation of coastal areas is possible.",
+        "instruction": "Move to high ground immediately or move inland out of tsunami hazard zones.",
         "web": "https://tsunami.gov",
         "senderName": "NWS National Tsunami Warning Center"
       }

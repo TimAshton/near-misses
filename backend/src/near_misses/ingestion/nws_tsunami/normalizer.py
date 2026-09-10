@@ -27,6 +27,12 @@ class NwsTsunamiNormalizer:
 
         occurred_raw = props.get("onset") or props.get("effective") or props.get("sent")
 
+        # NWS CAP alerts carry both a situation description and a separate
+        # "what to do" instruction — both are sentence-length prose worth
+        # surfacing, not just whichever one happens to be present.
+        description_parts = [p for p in [props.get("description"), props.get("instruction")] if p]
+        description = "\n\n".join(description_parts) or props.get("headline") or ""
+
         return NormalizedIncident(
             source="nws_tsunami",
             source_id=props.get("id"),
@@ -34,7 +40,7 @@ class NwsTsunamiNormalizer:
             event_type=event,
             severity=_SEVERITY_MAP.get(props.get("severity"), Severity.low),
             title=title,
-            description=props.get("description") or props.get("headline") or "",
+            description=description,
             occurred_at=datetime.fromisoformat(occurred_raw),
             source_url=props.get("web"),
             location=Location(lat=lat, lng=lng, display_name=area.split(";")[0].strip()),

@@ -26,6 +26,8 @@ def test_normalizes_warning_using_resolved_centroid_fallback():
     assert incident.location.lng == -151.7
     assert incident.location.lat == 57.8
     assert "Kodiak" in incident.title
+    assert "magnitude 7.8 earthquake" in incident.description
+    assert "Move to high ground immediately" in incident.description
 
 
 def test_normalizes_advisory_using_point_geometry():
@@ -51,3 +53,10 @@ def test_unknown_severity_defaults_to_low():
     }
     incident = NwsTsunamiNormalizer().normalize(raw)
     assert incident.severity == Severity.low
+
+
+def test_description_falls_back_to_headline_when_no_description_or_instruction():
+    props = {**_by_id("tsunami-advisory-002")["properties"], "description": None}
+    raw = {**_by_id("tsunami-advisory-002"), "properties": props}
+    incident = NwsTsunamiNormalizer().normalize(raw)
+    assert incident.description == props["headline"]
