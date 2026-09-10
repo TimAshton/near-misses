@@ -1,0 +1,54 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": null,
+      "properties": {
+        "id": "urn:oid:2.49.0.1.840.0.tsunami-warning-001",
+        "areaDesc": "Coastal Kodiak Island Borough; Coastal Kenai Peninsula Borough",
+        "geocode": {
+          "UGC": ["AKZ185", "AKZ186"]
+        },
+        "sent": "2026-09-10T04:12:00-08:00",
+        "effective": "2026-09-10T04:12:00-08:00",
+        "onset": "2026-09-10T04:12:00-08:00",
+        "expires": "2026-09-10T10:00:00-08:00",
+        "severity": "Extreme",
+        "certainty": "Observed",
+        "urgency": "Immediate",
+        "event": "Tsunami Warning",
+        "headline": "Tsunami Warning issued for the Alaska coast",
+        "description": "A tsunami warning is in effect following a magnitude 7.8 earthquake. Widespread inundation of coastal areas is possible. Move to high ground immediately.",
+        "web": "https://tsunami.gov",
+        "senderName": "NWS National Tsunami Warning Center"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-157.86, 21.31]
+      },
+      "properties": {
+        "id": "urn:oid:2.49.0.1.840.0.tsunami-advisory-002",
+        "areaDesc": "Coastal Honolulu County",
+        "geocode": {
+          "UGC": ["HIZ001"]
+        },
+        "sent": "2026-09-10T05:00:00-10:00",
+        "effective": "2026-09-10T05:00:00-10:00",
+        "onset": "2026-09-10T05:00:00-10:00",
+        "expires": "2026-09-10T09:00:00-10:00",
+        "severity": "Moderate",
+        "certainty": "Likely",
+        "urgency": "Expected",
+        "event": "Tsunami Advisory",
+        "headline": "Tsunami Advisory issued for Oahu coastal waters",
+        "description": "Strong currents and waves dangerous to those in or very near the water are possible.",
+        "web": "https://tsunami.gov",
+        "senderName": "NWS Pacific Tsunami Warning Center"
+      }
+    }
+  ]
+}

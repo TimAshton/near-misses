@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     ntsb_api_base: str = "https://data.ntsb.gov/carol-main-public/api/Query/Main"
     aviationweather_api_base: str = "https://aviationweather.gov/api/data"
     usgs_api_base: str = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
+    nws_api_base: str = "https://api.weather.gov"
+    nws_user_agent: str = "near-misses-incident-map (https://incidents.tashton.com)"
 
     poll_interval_minutes: int = 5
     scheduler_enabled: bool = True
