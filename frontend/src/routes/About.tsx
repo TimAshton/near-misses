@@ -31,10 +31,12 @@ export function About() {
           <h2 className="mb-1 text-base font-semibold text-gray-100">Refresh cadence &amp; data lag</h2>
           <p>
             The system polls source APIs automatically every 5 minutes, and a manual refresh is
-            available from the Dashboard. Note that some sources publish incident data only after
-            an investigation concludes, which can lag the real-world event by days to months —
-            the 5-minute poll interval reflects how quickly newly published records are picked up,
-            not how quickly incidents occurred.
+            available from the Dashboard. Aviation (NTSB) and rail (FRA) records are published only
+            after an investigation or report concludes, which can lag the real-world event by days
+            to months — the 5-minute poll interval reflects how quickly newly published records are
+            picked up, not how quickly incidents occurred. Earthquake, tsunami, and hurricane data
+            is different: those sources reflect live/current conditions with no investigation lag,
+            so the 5-minute interval there is close to real-time.
           </p>
         </section>
       </div>
