@@ -11,6 +11,7 @@ class Category(StrEnum):
     seismic = "seismic"
     tsunami = "tsunami"
     hurricane = "hurricane"
+    wildfire = "wildfire"
 
 
 class Severity(StrEnum):

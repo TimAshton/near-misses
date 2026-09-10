@@ -44,6 +44,7 @@ A large-screen web application that overlays publicly available US incident data
 | 3 | Earthquakes | USGS Earthquake Hazards API |
 | 4 | Tidal waves / Tsunamis | NOAA Tsunami Warning Center API |
 | 5 | Hurricanes | NOAA National Hurricane Center API |
+| 6 (added post-launch, not in original plan) | Wildfires | NIFC WFIGS current wildland fire incidents |
 
 For incidents covering large land areas (hurricanes, seismic zones), place the icon at the geographic center of the affected region.
 
@@ -56,8 +57,8 @@ All data sources write to a shared schema regardless of type:
 ```json
 {
   "id": "uuid",
-  "source": "faa | ntsb | fra | usgs | noaa-tsunami | noaa-hurricane",
-  "category": "aviation | rail | seismic | tsunami | hurricane",
+  "source": "faa | ntsb | fra | usgs | noaa-tsunami | noaa-hurricane | nifc-wildfire",
+  "category": "aviation | rail | seismic | tsunami | hurricane | wildfire",
   "event_type": "string",
   "severity": "low | medium | high | critical",
   "title": "string",

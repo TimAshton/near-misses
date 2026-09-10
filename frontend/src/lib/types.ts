@@ -1,4 +1,4 @@
-export type Category = "aviation" | "rail" | "seismic" | "tsunami" | "hurricane";
+export type Category = "aviation" | "rail" | "seismic" | "tsunami" | "hurricane" | "wildfire";
 
 export type Severity = "low" | "medium" | "high" | "critical";
 

@@ -8,9 +8,9 @@ export function About() {
           <h2 className="mb-1 text-base font-semibold text-gray-100">Project</h2>
           <p>
             US Incident Map overlays publicly available US incident data — aviation, rail,
-            seismic, tsunami, and hurricane — onto an interactive map. Data is polled from free
-            public APIs, normalized to a shared schema, and stored persistently. No authentication
-            is required to view the site.
+            seismic, tsunami, hurricane, and wildfire — onto an interactive map. Data is polled
+            from free public APIs, normalized to a shared schema, and stored persistently. No
+            authentication is required to view the site.
           </p>
         </section>
 
@@ -22,6 +22,7 @@ export function About() {
             the USGS Earthquake Hazards Program. Tsunami warnings/watches/advisories come from
             NOAA/NWS's public alerts feed. Rail equipment accidents/incidents come from FRA's Form
             54 data. Hurricanes and tropical storms come from NOAA's National Hurricane Center.
+            Wildfires come from NIFC's (National Interagency Fire Center) WFIGS incident feed.
             All raw source records are retained for auditing and can be viewed on each incident's
             detail page.
           </p>
@@ -34,9 +35,9 @@ export function About() {
             available from the Dashboard. Aviation (NTSB) and rail (FRA) records are published only
             after an investigation or report concludes, which can lag the real-world event by days
             to months — the 5-minute poll interval reflects how quickly newly published records are
-            picked up, not how quickly incidents occurred. Earthquake, tsunami, and hurricane data
-            is different: those sources reflect live/current conditions with no investigation lag,
-            so the 5-minute interval there is close to real-time.
+            picked up, not how quickly incidents occurred. Earthquake, tsunami, hurricane, and
+            wildfire data is different: those sources reflect live/current conditions with no
+            investigation lag, so the 5-minute interval there is close to real-time.
           </p>
         </section>
       </div>

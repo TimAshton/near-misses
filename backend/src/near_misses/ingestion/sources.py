@@ -3,6 +3,8 @@ from near_misses.ingestion.fra_rail.client import FraRailClient
 from near_misses.ingestion.fra_rail.normalizer import FraRailNormalizer
 from near_misses.ingestion.nhc_hurricane.client import NhcHurricaneClient
 from near_misses.ingestion.nhc_hurricane.normalizer import NhcHurricaneNormalizer
+from near_misses.ingestion.nifc_wildfire.client import NifcWildfireClient
+from near_misses.ingestion.nifc_wildfire.normalizer import NifcWildfireNormalizer
 from near_misses.ingestion.ntsb.client import NtsbClient
 from near_misses.ingestion.ntsb.normalizer import NtsbNormalizer
 from near_misses.ingestion.nws_tsunami.client import NwsTsunamiClient
@@ -23,4 +25,5 @@ def all_sources() -> list[tuple[SourceClient, Normalizer]]:
         (NwsTsunamiClient(), NwsTsunamiNormalizer()),
         (FraRailClient(), FraRailNormalizer()),
         (NhcHurricaneClient(), NhcHurricaneNormalizer()),
+        (NifcWildfireClient(), NifcWildfireNormalizer()),
     ]

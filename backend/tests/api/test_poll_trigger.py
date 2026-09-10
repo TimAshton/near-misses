@@ -45,6 +45,9 @@ def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session
             "near_misses.ingestion.nhc_hurricane.client.NhcHurricaneClient.fetch", return_value=[]
         ),
         patch(
+            "near_misses.ingestion.nifc_wildfire.client.NifcWildfireClient.fetch", return_value=[]
+        ),
+        patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
         ),
@@ -74,6 +77,9 @@ def test_trigger_poll_dedupes_on_second_run(client, db_session):
         patch("near_misses.ingestion.fra_rail.client.FraRailClient.fetch", return_value=[]),
         patch(
             "near_misses.ingestion.nhc_hurricane.client.NhcHurricaneClient.fetch", return_value=[]
+        ),
+        patch(
+            "near_misses.ingestion.nifc_wildfire.client.NifcWildfireClient.fetch", return_value=[]
         ),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
@@ -206,6 +212,38 @@ NHC_HURRICANE_FIXTURE_STORMS = [
 ]
 
 
+NIFC_WILDFIRE_FIXTURE_FEATURES = [
+    {
+        # Within US bounds -> persisted.
+        "attributes": {
+            "IncidentName": "PALISADES",
+            "IncidentSize": 23713.0,
+            "PercentContained": 45.0,
+            "FireDiscoveryDateTime": 1710439320000,
+            "POOState": "US-CA",
+            "POOCounty": "Los Angeles",
+            "FireCause": "Undetermined",
+            "UniqueFireIdentifier": "2026-CALAC-325444",
+        },
+        "geometry": {"x": -118.07282, "y": 34.03108},
+    },
+    {
+        # Non-US coordinate — should be rejected, not persisted.
+        "attributes": {
+            "IncidentName": "FOREIGN",
+            "IncidentSize": 500.0,
+            "PercentContained": 10.0,
+            "FireDiscoveryDateTime": 1710439320000,
+            "POOState": "US-XX",
+            "POOCounty": "Nowhere",
+            "FireCause": "Undetermined",
+            "UniqueFireIdentifier": "2026-XXNOW-000001",
+        },
+        "geometry": {"x": 140.0, "y": 34.0},
+    },
+]
+
+
 def test_trigger_poll_runs_all_sources_together(client, db_session):
     with (
         patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
@@ -225,19 +263,23 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
             "near_misses.ingestion.nhc_hurricane.client.NhcHurricaneClient.fetch",
             return_value=NHC_HURRICANE_FIXTURE_STORMS,
         ),
+        patch(
+            "near_misses.ingestion.nifc_wildfire.client.NifcWildfireClient.fetch",
+            return_value=NIFC_WILDFIRE_FIXTURE_FEATURES,
+        ),
         patch("near_misses.ingestion.pipeline.archive_raw_response", return_value="raw/x.json"),
     ):
         response = client.post("/api/poll/trigger")
 
     body = response.json()
-    assert body["fetched"] == 9
-    assert body["new_incidents"] == 5
-    assert body["rejected_non_us"] == 3
+    assert body["fetched"] == 11
+    assert body["new_incidents"] == 6
+    assert body["rejected_non_us"] == 4
     assert body["below_min_severity"] == 1
 
     incidents = client.get("/api/incidents").json()
     categories = {i["category"] for i in incidents["items"]}
-    assert categories == {"aviation", "seismic", "tsunami", "rail", "hurricane"}
+    assert categories == {"aviation", "seismic", "tsunami", "rail", "hurricane", "wildfire"}
     rail_incidents = [i for i in incidents["items"] if i["category"] == "rail"]
     assert len(rail_incidents) == 1
     assert rail_incidents[0]["severity"] == "medium"

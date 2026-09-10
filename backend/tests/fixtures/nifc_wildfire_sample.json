@@ -1,0 +1,56 @@
+{
+  "features": [
+    {
+      "attributes": {
+        "IncidentName": "PALISADES",
+        "IncidentSize": 23713.0,
+        "PercentContained": 45.0,
+        "FireDiscoveryDateTime": 1789058819000,
+        "POOState": "US-CA",
+        "POOCounty": "Los Angeles",
+        "FireCause": "Undetermined",
+        "UniqueFireIdentifier": "2026-CALAC-325444"
+      },
+      "geometry": {"x": -118.07282, "y": 34.03108}
+    },
+    {
+      "attributes": {
+        "IncidentName": "SMOKEHOUSE",
+        "IncidentSize": 3500.0,
+        "PercentContained": 20.0,
+        "FireDiscoveryDateTime": 1789057407000,
+        "POOState": "US-OR",
+        "POOCounty": "Jackson",
+        "FireCause": "Lightning",
+        "UniqueFireIdentifier": "2026-ORJAC-100123"
+      },
+      "geometry": {"x": -122.87, "y": 42.33}
+    },
+    {
+      "attributes": {
+        "IncidentName": "LUCAS",
+        "IncidentSize": 0.01,
+        "PercentContained": null,
+        "FireDiscoveryDateTime": 1789057088000,
+        "POOState": "US-CA",
+        "POOCounty": "Mendocino",
+        "FireCause": "Undetermined",
+        "UniqueFireIdentifier": "2026-CAMEU-010693"
+      },
+      "geometry": {"x": -123.012, "y": 39.2385}
+    },
+    {
+      "attributes": {
+        "IncidentName": "JUST DISCOVERED",
+        "IncidentSize": null,
+        "PercentContained": null,
+        "FireDiscoveryDateTime": 1789058900000,
+        "POOState": "US-TX",
+        "POOCounty": "Travis",
+        "FireCause": null,
+        "UniqueFireIdentifier": "2026-TXTRV-000001"
+      },
+      "geometry": {"x": -97.75, "y": 30.27}
+    }
+  ]
+}

@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     nws_user_agent: str = "near-misses-incident-map (https://incidents.tashton.com)"
     fra_api_base: str = "https://data.transportation.gov/resource/85tf-25kj.json"
     nhc_api_base: str = "https://www.nhc.noaa.gov/CurrentStorms.json"
+    nifc_api_base: str = (
+        "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/"
+        "WFIGS_Incident_Locations_Current/FeatureServer/0/query"
+    )
 
     poll_interval_minutes: int = 5
     scheduler_enabled: bool = True

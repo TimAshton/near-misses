@@ -17,8 +17,8 @@ export function Home() {
     <PageShell title="US Incident Map">
       <p className="mb-6 max-w-2xl text-gray-400">
         A large-screen dashboard overlaying publicly available US incident data — aviation, rail,
-        seismic, tsunami, and hurricane — onto an interactive map, polled from free public APIs
-        and normalized to a shared schema.
+        seismic, tsunami, hurricane, and wildfire — onto an interactive map, polled from free
+        public APIs and normalized to a shared schema.
       </p>
 
       <div className="mb-8 grid grid-cols-3 gap-4">
