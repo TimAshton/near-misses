@@ -1,8 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import type { Incident } from "../../lib/types";
 import { createMarkerElement } from "./IncidentMarker";
+
+// MapLibre v6 ships its tile-parsing worker as a separate file rather than
+// inlining it — without pointing at a real, bundled URL for it, the worker
+// script 404s (or, behind our SPA fallback routing, silently loads index.html
+// instead) and vector tiles never render, even though the style/sprite load
+// fine and no error surfaces on the main thread.
+maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
 // OpenFreeMap: no signup, no API key, no usage cap — https://openfreemap.org
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/dark";

@@ -10,7 +10,9 @@ interface PageShellProps {
 
 export function PageShell({ title, children, actions, fullBleed }: PageShellProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-950 text-gray-100">
+    <div
+      className={`flex flex-col bg-gray-950 text-gray-100 ${fullBleed ? "h-screen" : "min-h-screen"}`}
+    >
       <NavBar />
       <div className={fullBleed ? "flex flex-1 flex-col" : "mx-auto w-full max-w-7xl flex-1 px-6 py-6"}>
         <div className="mb-4 flex items-center justify-between">
