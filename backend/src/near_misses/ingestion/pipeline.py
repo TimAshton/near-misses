@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from near_misses.ingestion.base import Normalizer, SourceClient
 from near_misses.ingestion.dedup import is_duplicate
+from near_misses.ingestion.severity_policy import meets_minimum_severity
 from near_misses.ingestion.us_bounds import is_us_location
 from near_misses.models.incident import Incident
 from near_misses.schemas.incident import IncidentSummaryOut, PollResult
@@ -29,12 +30,17 @@ async def run_ingestion(
     new_count = 0
     duplicate_count = 0
     rejected_count = 0
+    below_min_severity_count = 0
 
     for raw in raw_records:
         try:
             normalized = normalizer.normalize(raw)
         except Exception:
             logger.exception("Failed to normalize record from %s", source_client.source_name)
+            continue
+
+        if not meets_minimum_severity(normalized.category, normalized.severity):
+            below_min_severity_count += 1
             continue
 
         if not is_us_location(normalized.location.lat, normalized.location.lng):
@@ -80,6 +86,7 @@ async def run_ingestion(
         new_incidents=new_count,
         duplicates=duplicate_count,
         rejected_non_us=rejected_count,
+        below_min_severity=below_min_severity_count,
         triggered_at=datetime.now(UTC),
     )
 
@@ -91,18 +98,20 @@ async def run_all_sources(
     into one PollResult, so scheduled/manual polling stays a single call
     regardless of how many phases (sources) are wired in.
     """
-    fetched = new_incidents = duplicates = rejected_non_us = 0
+    fetched = new_incidents = duplicates = rejected_non_us = below_min_severity = 0
     for source_client, normalizer in sources:
         result = await run_ingestion(db, source_client, normalizer)
         fetched += result.fetched
         new_incidents += result.new_incidents
         duplicates += result.duplicates
         rejected_non_us += result.rejected_non_us
+        below_min_severity += result.below_min_severity
 
     return PollResult(
         fetched=fetched,
         new_incidents=new_incidents,
         duplicates=duplicates,
         rejected_non_us=rejected_non_us,
+        below_min_severity=below_min_severity,
         triggered_at=datetime.now(UTC),
     )

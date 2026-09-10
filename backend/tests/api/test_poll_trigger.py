@@ -138,6 +138,7 @@ NWS_TSUNAMI_FIXTURE_FEATURES = [
 
 FRA_RAIL_FIXTURE_RECORDS = [
     {
+        # High damage, no casualties -> medium severity -> persisted.
         "date": "2024-03-14T00:00:00.000",
         "time": "10:56 PM",
         "accidenttype": "Derailment",
@@ -145,12 +146,28 @@ FRA_RAIL_FIXTURE_RECORDS = [
         "station": "CONWAY",
         "totalpersonskilled": "0",
         "totalpersonsinjured": "0",
-        "totaldamagecost": "169687",
+        "totaldamagecost": "450000",
         "latitude": "40.672362",
         "longitude": "-80.251826",
         "incidentkey": "NS171002202606",
         "narrative": "Test narrative.",
         "url": {"url": "https://safetydata.fra.dot.gov/x"},
+    },
+    {
+        # Low damage, no casualties -> low severity -> filtered out by policy.
+        "date": "2024-03-15T00:00:00.000",
+        "time": "9:00 AM",
+        "accidenttype": "Obstruction",
+        "stateabbr": "OH",
+        "station": "TOLEDO",
+        "totalpersonskilled": "0",
+        "totalpersonsinjured": "0",
+        "totaldamagecost": "5000",
+        "latitude": "41.6528",
+        "longitude": "-83.5379",
+        "incidentkey": "AA260630002202606",
+        "narrative": "Test narrative.",
+        "url": {"url": "https://safetydata.fra.dot.gov/y"},
     },
 ]
 
@@ -175,10 +192,14 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
         response = client.post("/api/poll/trigger")
 
     body = response.json()
-    assert body["fetched"] == 6
+    assert body["fetched"] == 7
     assert body["new_incidents"] == 4
     assert body["rejected_non_us"] == 2
+    assert body["below_min_severity"] == 1
 
     incidents = client.get("/api/incidents").json()
     categories = {i["category"] for i in incidents["items"]}
     assert categories == {"aviation", "seismic", "tsunami", "rail"}
+    rail_incidents = [i for i in incidents["items"] if i["category"] == "rail"]
+    assert len(rail_incidents) == 1
+    assert rail_incidents[0]["severity"] == "medium"

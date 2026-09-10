@@ -125,6 +125,7 @@ class PollResult(BaseModel):
     new_incidents: int
     duplicates: int
     rejected_non_us: int
+    below_min_severity: int
     triggered_at: datetime
 
 
