@@ -1,4 +1,6 @@
 from near_misses.ingestion.base import Normalizer, SourceClient
+from near_misses.ingestion.fra_rail.client import FraRailClient
+from near_misses.ingestion.fra_rail.normalizer import FraRailNormalizer
 from near_misses.ingestion.ntsb.client import NtsbClient
 from near_misses.ingestion.ntsb.normalizer import NtsbNormalizer
 from near_misses.ingestion.nws_tsunami.client import NwsTsunamiClient
@@ -17,4 +19,5 @@ def all_sources() -> list[tuple[SourceClient, Normalizer]]:
         (NtsbClient(), NtsbNormalizer()),
         (UsgsClient(), UsgsNormalizer()),
         (NwsTsunamiClient(), NwsTsunamiNormalizer()),
+        (FraRailClient(), FraRailNormalizer()),
     ]

@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     usgs_api_base: str = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_hour.geojson"
     nws_api_base: str = "https://api.weather.gov"
     nws_user_agent: str = "near-misses-incident-map (https://incidents.tashton.com)"
+    fra_api_base: str = "https://data.transportation.gov/resource/85tf-25kj.json"
 
     poll_interval_minutes: int = 5
     scheduler_enabled: bool = True

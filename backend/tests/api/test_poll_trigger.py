@@ -40,6 +40,7 @@ def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session
         patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
         patch("near_misses.ingestion.usgs.client.UsgsClient.fetch", return_value=[]),
         patch("near_misses.ingestion.nws_tsunami.client.NwsTsunamiClient.fetch", return_value=[]),
+        patch("near_misses.ingestion.fra_rail.client.FraRailClient.fetch", return_value=[]),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
@@ -67,6 +68,7 @@ def test_trigger_poll_dedupes_on_second_run(client, db_session):
         ),
         patch("near_misses.ingestion.usgs.client.UsgsClient.fetch", return_value=[]),
         patch("near_misses.ingestion.nws_tsunami.client.NwsTsunamiClient.fetch", return_value=[]),
+        patch("near_misses.ingestion.fra_rail.client.FraRailClient.fetch", return_value=[]),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
@@ -134,6 +136,25 @@ NWS_TSUNAMI_FIXTURE_FEATURES = [
 ]
 
 
+FRA_RAIL_FIXTURE_RECORDS = [
+    {
+        "date": "2024-03-14T00:00:00.000",
+        "time": "10:56 PM",
+        "accidenttype": "Derailment",
+        "stateabbr": "PA",
+        "station": "CONWAY",
+        "totalpersonskilled": "0",
+        "totalpersonsinjured": "0",
+        "totaldamagecost": "169687",
+        "latitude": "40.672362",
+        "longitude": "-80.251826",
+        "incidentkey": "NS171002202606",
+        "narrative": "Test narrative.",
+        "url": {"url": "https://safetydata.fra.dot.gov/x"},
+    },
+]
+
+
 def test_trigger_poll_runs_all_sources_together(client, db_session):
     with (
         patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
@@ -145,15 +166,19 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
             "near_misses.ingestion.nws_tsunami.client.NwsTsunamiClient.fetch",
             return_value=NWS_TSUNAMI_FIXTURE_FEATURES,
         ),
+        patch(
+            "near_misses.ingestion.fra_rail.client.FraRailClient.fetch",
+            return_value=FRA_RAIL_FIXTURE_RECORDS,
+        ),
         patch("near_misses.ingestion.pipeline.archive_raw_response", return_value="raw/x.json"),
     ):
         response = client.post("/api/poll/trigger")
 
     body = response.json()
-    assert body["fetched"] == 5
-    assert body["new_incidents"] == 3
+    assert body["fetched"] == 6
+    assert body["new_incidents"] == 4
     assert body["rejected_non_us"] == 2
 
     incidents = client.get("/api/incidents").json()
     categories = {i["category"] for i in incidents["items"]}
-    assert categories == {"aviation", "seismic", "tsunami"}
+    assert categories == {"aviation", "seismic", "tsunami", "rail"}

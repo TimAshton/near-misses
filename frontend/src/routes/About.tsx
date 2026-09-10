@@ -17,9 +17,12 @@ export function About() {
         <section>
           <h2 className="mb-1 text-base font-semibold text-gray-100">Data sources &amp; attribution</h2>
           <p>
-            Phase 1 (Aviation) sources incident records from the NTSB accident/incident database,
-            with FAA data incorporated where it is publicly accessible. All raw source records are
-            retained for auditing and can be viewed on each incident's detail page.
+            Aviation incidents are sourced from the NTSB accident/incident database, with FAA data
+            incorporated where it is publicly accessible. Earthquakes (magnitude 2.5+) come from
+            the USGS Earthquake Hazards Program. Tsunami warnings/watches/advisories come from
+            NOAA/NWS's public alerts feed. Rail equipment accidents/incidents come from FRA's Form
+            54 data. All raw source records are retained for auditing and can be viewed on each
+            incident's detail page.
           </p>
         </section>
 
