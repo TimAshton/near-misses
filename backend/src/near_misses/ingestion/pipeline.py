@@ -82,3 +82,27 @@ async def run_ingestion(
         rejected_non_us=rejected_count,
         triggered_at=datetime.now(UTC),
     )
+
+
+async def run_all_sources(
+    db: Session, sources: list[tuple[SourceClient, Normalizer]]
+) -> PollResult:
+    """Runs run_ingestion for every configured source and folds the results
+    into one PollResult, so scheduled/manual polling stays a single call
+    regardless of how many phases (sources) are wired in.
+    """
+    fetched = new_incidents = duplicates = rejected_non_us = 0
+    for source_client, normalizer in sources:
+        result = await run_ingestion(db, source_client, normalizer)
+        fetched += result.fetched
+        new_incidents += result.new_incidents
+        duplicates += result.duplicates
+        rejected_non_us += result.rejected_non_us
+
+    return PollResult(
+        fetched=fetched,
+        new_incidents=new_incidents,
+        duplicates=duplicates,
+        rejected_non_us=rejected_non_us,
+        triggered_at=datetime.now(UTC),
+    )

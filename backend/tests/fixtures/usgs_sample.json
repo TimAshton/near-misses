@@ -1,0 +1,84 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "title": "USGS All Earthquakes, Past Hour"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ci40624840",
+      "properties": {
+        "mag": 4.8,
+        "place": "10km NW of Ridgecrest, CA",
+        "title": "M 4.8 - 10km NW of Ridgecrest, CA",
+        "time": 1710439320000,
+        "updated": 1710440000000,
+        "type": "earthquake",
+        "status": "reviewed",
+        "tsunami": 0,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci40624840"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.6709, 35.7695, 8.42]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ak02451234",
+      "properties": {
+        "mag": 6.7,
+        "place": "82km SE of Chignik Lake, Alaska",
+        "title": "M 6.7 - 82km SE of Chignik Lake, Alaska",
+        "time": 1710439900000,
+        "updated": 1710440500000,
+        "type": "earthquake",
+        "status": "reviewed",
+        "tsunami": 1,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ak02451234"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-155.6, 55.9, 32.1]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "nc73999999",
+      "properties": {
+        "mag": 1.2,
+        "place": "5km E of Cobb, California",
+        "title": "M 1.2 - 5km E of Cobb, CA",
+        "time": 1710440100000,
+        "updated": 1710440200000,
+        "type": "quarry blast",
+        "status": "automatic",
+        "tsunami": 0,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/nc73999999"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.71, 38.83, 0.5]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "us7000abcd",
+      "properties": {
+        "mag": 5.9,
+        "place": "100km SE of Tokyo, Japan",
+        "title": "M 5.9 - 100km SE of Tokyo, Japan",
+        "time": 1710441000000,
+        "updated": 1710441500000,
+        "type": "earthquake",
+        "status": "reviewed",
+        "tsunami": 0,
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us7000abcd"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [140.0, 34.0, 35.0]
+      }
+    }
+  ]
+}

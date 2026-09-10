@@ -37,7 +37,8 @@ FIXTURE_RECORDS = [
 
 def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session):
     with (
-        patch("near_misses.api.routes.poll.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
+        patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
+        patch("near_misses.ingestion.usgs.client.UsgsClient.fetch", return_value=[]),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
@@ -59,7 +60,11 @@ def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session
 
 def test_trigger_poll_dedupes_on_second_run(client, db_session):
     with (
-        patch("near_misses.api.routes.poll.NtsbClient.fetch", return_value=FIXTURE_RECORDS[:1]),
+        patch(
+            "near_misses.ingestion.ntsb.client.NtsbClient.fetch",
+            return_value=FIXTURE_RECORDS[:1],
+        ),
+        patch("near_misses.ingestion.usgs.client.UsgsClient.fetch", return_value=[]),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
@@ -70,3 +75,55 @@ def test_trigger_poll_dedupes_on_second_run(client, db_session):
 
     assert second.json()["new_incidents"] == 0
     assert second.json()["duplicates"] == 1
+
+
+USGS_FIXTURE_FEATURES = [
+    {
+        "type": "Feature",
+        "id": "ci12345",
+        "properties": {
+            "mag": 4.8,
+            "place": "10km NW of Ridgecrest, CA",
+            "title": "M 4.8 - 10km NW of Ridgecrest, CA",
+            "time": 1710439320000,
+            "type": "earthquake",
+            "url": "https://earthquake.usgs.gov/earthquakes/eventpage/ci12345",
+        },
+        "geometry": {"type": "Point", "coordinates": [-117.6709, 35.7695, 8.0]},
+    },
+    {
+        # Non-US coordinate — should be rejected, not persisted.
+        "type": "Feature",
+        "id": "us9999",
+        "properties": {
+            "mag": 5.5,
+            "place": "100km SE of Tokyo, Japan",
+            "title": "M 5.5 - 100km SE of Tokyo, Japan",
+            "time": 1710439320000,
+            "type": "earthquake",
+            "url": "https://earthquake.usgs.gov/earthquakes/eventpage/us9999",
+        },
+        "geometry": {"type": "Point", "coordinates": [140.0, 34.0, 35.0]},
+    },
+]
+
+
+def test_trigger_poll_runs_all_sources_together(client, db_session):
+    with (
+        patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
+        patch(
+            "near_misses.ingestion.usgs.client.UsgsClient.fetch",
+            return_value=USGS_FIXTURE_FEATURES,
+        ),
+        patch("near_misses.ingestion.pipeline.archive_raw_response", return_value="raw/x.json"),
+    ):
+        response = client.post("/api/poll/trigger")
+
+    body = response.json()
+    assert body["fetched"] == 4
+    assert body["new_incidents"] == 2
+    assert body["rejected_non_us"] == 2
+
+    incidents = client.get("/api/incidents").json()
+    categories = {i["category"] for i in incidents["items"]}
+    assert categories == {"aviation", "seismic"}
