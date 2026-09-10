@@ -122,7 +122,7 @@ near-misses/
 
 - `docker-compose.yml`: `postgres` (local RDS stand-in), `localstack` running only S3 (`s3_archive.py` reads `S3_ENDPOINT_URL`, defaulting to real AWS in prod, localstack in dev/test), `backend` (uvicorn `--reload`), optional `frontend` (or run `npm run dev` on host for faster HMR, `VITE_API_URL` → `http://localhost:8000`).
 - `config.py` reads all AWS-shaped values from env vars so the same code runs unmodified against localstack locally and real AWS when deployed — no environment branching in application code.
-- Mapbox requires a real API token even locally — developers use a personal free-tier token via `.env.local` (not committed).
+- ~~Mapbox requires a real API token even locally~~ — resolved (see Open Question 3): the map runs on MapLibre GL JS + OpenFreeMap tiles, no token/account needed anywhere.
 - Fresh-clone order: `docker compose up postgres localstack` → `alembic upgrade head` → `uvicorn near_misses.main:app --reload` → `npm run dev` in `frontend/`.
 - `POST /api/poll/trigger` is the primary way to exercise ingestion locally without waiting on the 5-minute scheduler.
 
@@ -140,7 +140,7 @@ near-misses/
 
 1. **FAA AIDS access is unverified** (Step 3 spike) — if it turns out not to be a usable open API/feed, the fallback to NTSB should be confirmed with the spec owner once the spike concludes, since it changes what "Phase 1 approval" is actually approving.
 2. **Source data lag** — investigation-driven sources (NTSB, and likely FAA AIDS) may lag real-world events by weeks/months; this should be disclosed on the About page rather than implying the 5-minute poll means near-real-time incident coverage.
-3. **Mapbox cost/key** — requires a real API token; free tier has monthly load limits. Since the app is public/unauthenticated and meant for always-on large-screen display, confirm expected deployment context (kiosk vs. open internet) before assuming free tier holds up long-term.
+3. **Mapbox cost/key** — **Resolved**: switched to MapLibre GL JS (Mapbox GL JS's open-source fork, same API) styled with [OpenFreeMap](https://openfreemap.org) tiles, which needs no signup, API key, or credit card and has no usage cap — a better fit for a public/unauthenticated, always-on large-screen display than a metered Mapbox token.
 4. **ECS Fargate may be more infra than this traffic needs** — Phase 1 is a small API plus a 5-minute batch job and a handful of large-screen clients. Following the spec's explicit ECS Fargate + Terraform choice as written; revisit cost/complexity once real usage is known.
 5. **RDS Postgres may be oversized for data volume** — aviation incident volume is modest (hundreds–low thousands/year). Fully functional as specified; worth a cost/instance-sizing pass during Step 13 rather than defaulting to a larger instance class.
 6. **Frontend/backend type drift** — `frontend/src/lib/types.ts` is hand-maintained to mirror the Pydantic schema. Consider generating TS types from FastAPI's OpenAPI schema (e.g. `openapi-typescript`) as a follow-up hardening step once Phase 1 stabilizes; not required for initial build.

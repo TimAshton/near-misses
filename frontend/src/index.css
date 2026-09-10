@@ -18,7 +18,7 @@ body {
 }
 
 /* Large-screen only app (min-width: 1024px per spec) */
-.mapboxgl-popup-content {
+.maplibregl-popup-content {
   background: #111827 !important;
   color: #e5e7eb !important;
 }

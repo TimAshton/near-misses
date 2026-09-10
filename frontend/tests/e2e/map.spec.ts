@@ -3,11 +3,6 @@ import { test, expect } from "@playwright/test";
 test("map page renders markers and opens a detail preview on click", async ({ page }) => {
   await page.goto("/map");
 
-  const tokenMissing = page.getByTestId("mapbox-token-missing");
-  if (await tokenMissing.isVisible().catch(() => false)) {
-    test.skip(true, "VITE_MAPBOX_TOKEN not configured in this environment");
-  }
-
   await expect(page.getByTestId("incident-map")).toBeVisible();
   await expect(page.getByTestId("filter-panel")).toBeVisible();
 

@@ -28,7 +28,9 @@ constraints in detail. Key points to know without re-reading the whole spec ever
   normalize → dedupe (by ID or source+occurred_at) → write to RDS → archive raw
   response to S3 → broadcast to clients over WebSocket.
 - **Intended stack** (per spec, not yet present in repo): React + TypeScript (Vite),
-  Mapbox GL JS, Tailwind, Recharts on the frontend; Python/FastAPI with
+  MapLibre GL JS (OpenFreeMap tiles — swapped from the originally spec'd Mapbox GL JS
+  to avoid a signup/billing-profile requirement; see SPEC.md), Tailwind, Recharts on
+  the frontend; Python/FastAPI with
   APScheduler-or-Celery+Redis and SQLAlchemy on the backend; AWS RDS Postgres + S3
   for data; Terraform for all infrastructure (no manual AWS console changes).
 - **Hard constraints**: US incidents only (reject non-US coordinates at ingestion), no

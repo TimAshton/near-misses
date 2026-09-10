@@ -84,7 +84,7 @@ All data sources write to a shared schema regardless of type:
 
 ### Frontend
 - **React + TypeScript** (Vite)
-- **Mapbox GL JS** — interactive map
+- **MapLibre GL JS** (styled with [OpenFreeMap](https://openfreemap.org) tiles) — interactive map. Originally spec'd as Mapbox GL JS; switched during implementation to avoid requiring a Mapbox account/billing-profile signup for a free-tier key — MapLibre is Mapbox GL JS's open-source fork with the same API, and OpenFreeMap needs no signup, key, or usage cap.
 - **Tailwind CSS** — styling
 - **Recharts** — dashboard charts
 - **WebSocket client** — receives real-time incident pushes, updates map and dashboard without page refresh
