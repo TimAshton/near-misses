@@ -19,3 +19,15 @@ variable "api_origin_domain_name" {
   EOT
   type        = string
 }
+
+variable "aliases" {
+  description = "Alternate domain names (CNAMEs) to serve the distribution on, e.g. [\"incidents.tashton.com\"]"
+  type        = list(string)
+  default     = []
+}
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN (must be in us-east-1) covering var.aliases. Null falls back to the default *.cloudfront.net certificate."
+  type        = string
+  default     = null
+}

@@ -1,7 +1,3 @@
-# No custom domain / ACM cert wired up yet (needs a Route53 zone the
-# coordinator would need to supply) — this serves off the default
-# *.cloudfront.net domain. See PLAN.md outputs note.
-
 resource "aws_s3_bucket" "frontend" {
   bucket = var.bucket_name
 
@@ -28,6 +24,8 @@ resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   default_root_object = "index.html"
   comment             = "${var.name} frontend"
+  aliases             = var.aliases
+  is_ipv6_enabled     = true
 
   origin {
     domain_name              = aws_s3_bucket.frontend.bucket_regional_domain_name
@@ -112,7 +110,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = var.acm_certificate_arn == null
+    acm_certificate_arn            = var.acm_certificate_arn
+    ssl_support_method             = var.acm_certificate_arn == null ? null : "sni-only"
+    minimum_protocol_version       = var.acm_certificate_arn == null ? null : "TLSv1.2_2021"
   }
 
   tags = { Name = "${var.name}-frontend" }

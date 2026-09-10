@@ -25,8 +25,28 @@ provider "aws" {
   }
 }
 
+# CloudFront requires its ACM certificate to live in us-east-1 regardless of
+# which region the rest of the stack runs in.
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+
+  default_tags {
+    tags = {
+      Project     = var.project_name
+      Environment = var.environment
+      ManagedBy   = "terraform"
+    }
+  }
+}
+
 locals {
   name = "${var.project_name}-${var.environment}"
+}
+
+data "aws_route53_zone" "root" {
+  name         = "${var.root_domain}."
+  private_zone = false
 }
 
 # S3 bucket names must be globally unique across all of AWS — suffix with a
@@ -54,12 +74,48 @@ module "s3_archive" {
   bucket_name = "${local.name}-archive-${random_id.bucket_suffix.hex}"
 }
 
+module "certificate" {
+  source = "../../modules/certificate"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  domain_name = var.domain_name
+  zone_id     = data.aws_route53_zone.root.zone_id
+}
+
 module "frontend_hosting" {
   source = "../../modules/frontend-hosting"
 
   name                   = local.name
   bucket_name            = "${local.name}-frontend-${random_id.bucket_suffix.hex}"
   api_origin_domain_name = module.ecs.alb_dns_name
+  aliases                = [var.domain_name]
+  acm_certificate_arn    = module.certificate.certificate_arn
+}
+
+resource "aws_route53_record" "frontend_a" {
+  zone_id = data.aws_route53_zone.root.zone_id
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = module.frontend_hosting.cloudfront_domain_name
+    zone_id                = module.frontend_hosting.cloudfront_hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "frontend_aaaa" {
+  zone_id = data.aws_route53_zone.root.zone_id
+  name    = var.domain_name
+  type    = "AAAA"
+
+  alias {
+    name                   = module.frontend_hosting.cloudfront_domain_name
+    zone_id                = module.frontend_hosting.cloudfront_hosted_zone_id
+    evaluate_target_health = false
+  }
 }
 
 module "rds" {

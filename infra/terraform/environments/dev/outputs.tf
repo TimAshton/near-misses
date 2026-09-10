@@ -1,9 +1,13 @@
-# frontend_url / api_url use the raw CloudFront/ALB domains since no custom
-# domain + ACM cert is wired up yet (would need a Route53 hosted zone
-# supplied by the project owner). See PLAN.md.
+# api_url uses the raw ALB domain — the frontend and browser-facing API
+# calls go through the custom domain (same-origin via CloudFront's /api/*
+# behavior); the ALB itself stays HTTP-only behind CloudFront.
 
 output "frontend_url" {
-  value = "https://${module.frontend_hosting.cloudfront_domain_name}"
+  value = "https://${var.domain_name}"
+}
+
+output "cloudfront_domain_name" {
+  value = module.frontend_hosting.cloudfront_domain_name
 }
 
 output "api_url" {
