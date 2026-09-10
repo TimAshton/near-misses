@@ -17,7 +17,7 @@ export function PageShell({ title, children, actions, fullBleed }: PageShellProp
           <h1 className="text-2xl font-semibold text-gray-100">{title}</h1>
           {actions}
         </div>
-        <div className="flex-1">{children}</div>
+        <div className="flex flex-1 flex-col">{children}</div>
       </div>
     </div>
   );
