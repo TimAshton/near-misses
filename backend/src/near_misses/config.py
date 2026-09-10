@@ -29,7 +29,10 @@ class Settings(BaseSettings):
 
     ntsb_api_base: str = "https://data.ntsb.gov/carol-main-public/api/Query/Main"
     aviationweather_api_base: str = "https://aviationweather.gov/api/data"
-    usgs_api_base: str = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
+    # 2.5+ feed, not "all": low-magnitude (<2.5) quakes are numerous and not
+    # worth tracking on this map — see UsgsClient's own client-side filter,
+    # which enforces the cutoff exactly regardless of this feed's boundary.
+    usgs_api_base: str = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_hour.geojson"
     nws_api_base: str = "https://api.weather.gov"
     nws_user_agent: str = "near-misses-incident-map (https://incidents.tashton.com)"
 
