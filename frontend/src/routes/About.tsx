@@ -21,8 +21,9 @@ export function About() {
             incorporated where it is publicly accessible. Earthquakes (magnitude 2.5+) come from
             the USGS Earthquake Hazards Program. Tsunami warnings/watches/advisories come from
             NOAA/NWS's public alerts feed. Rail equipment accidents/incidents come from FRA's Form
-            54 data. All raw source records are retained for auditing and can be viewed on each
-            incident's detail page.
+            54 data. Hurricanes and tropical storms come from NOAA's National Hurricane Center.
+            All raw source records are retained for auditing and can be viewed on each incident's
+            detail page.
           </p>
         </section>
 

@@ -47,6 +47,10 @@ class FraRailNormalizer:
 
         url = (raw.get("url") or {}).get("url")
 
+        cause = raw.get("primaryaccidentcause")
+        narrative = (raw.get("narrative") or "").strip()
+        description = f"Cause: {cause}. {narrative}".strip() if cause else narrative
+
         return NormalizedIncident(
             source="fra_rail",
             source_id=raw.get("incidentkey"),
@@ -54,7 +58,7 @@ class FraRailNormalizer:
             event_type=event_type,
             severity=_severity_for(raw),
             title=title,
-            description=(raw.get("narrative") or "").strip(),
+            description=description,
             occurred_at=_occurred_at(raw),
             source_url=url,
             location=Location(

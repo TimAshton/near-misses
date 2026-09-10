@@ -42,6 +42,9 @@ def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session
         patch("near_misses.ingestion.nws_tsunami.client.NwsTsunamiClient.fetch", return_value=[]),
         patch("near_misses.ingestion.fra_rail.client.FraRailClient.fetch", return_value=[]),
         patch(
+            "near_misses.ingestion.nhc_hurricane.client.NhcHurricaneClient.fetch", return_value=[]
+        ),
+        patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
         ),
@@ -69,6 +72,9 @@ def test_trigger_poll_dedupes_on_second_run(client, db_session):
         patch("near_misses.ingestion.usgs.client.UsgsClient.fetch", return_value=[]),
         patch("near_misses.ingestion.nws_tsunami.client.NwsTsunamiClient.fetch", return_value=[]),
         patch("near_misses.ingestion.fra_rail.client.FraRailClient.fetch", return_value=[]),
+        patch(
+            "near_misses.ingestion.nhc_hurricane.client.NhcHurricaneClient.fetch", return_value=[]
+        ),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
@@ -172,6 +178,34 @@ FRA_RAIL_FIXTURE_RECORDS = [
 ]
 
 
+NHC_HURRICANE_FIXTURE_STORMS = [
+    {
+        # Within US bounds -> persisted.
+        "id": "al092026",
+        "name": "Milton",
+        "classification": "HU",
+        "intensity": "115",
+        "pressure": "935",
+        "latitudeNumeric": 27.5,
+        "longitudeNumeric": -83.2,
+        "lastUpdate": "2024-03-14T18:42:00.000Z",
+        "publicAdvisory": {"url": "https://www.nhc.noaa.gov/text/MIATCPAT1.shtml"},
+    },
+    {
+        # Non-US coordinate — should be rejected, not persisted.
+        "id": "ep142026",
+        "name": "Norbert",
+        "classification": "TS",
+        "intensity": "35",
+        "pressure": "1003",
+        "latitudeNumeric": 16.5,
+        "longitudeNumeric": -119.3,
+        "lastUpdate": "2024-03-14T18:42:00.000Z",
+        "publicAdvisory": {"url": "https://www.nhc.noaa.gov/text/MIATCPEP4.shtml"},
+    },
+]
+
+
 def test_trigger_poll_runs_all_sources_together(client, db_session):
     with (
         patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
@@ -187,19 +221,23 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
             "near_misses.ingestion.fra_rail.client.FraRailClient.fetch",
             return_value=FRA_RAIL_FIXTURE_RECORDS,
         ),
+        patch(
+            "near_misses.ingestion.nhc_hurricane.client.NhcHurricaneClient.fetch",
+            return_value=NHC_HURRICANE_FIXTURE_STORMS,
+        ),
         patch("near_misses.ingestion.pipeline.archive_raw_response", return_value="raw/x.json"),
     ):
         response = client.post("/api/poll/trigger")
 
     body = response.json()
-    assert body["fetched"] == 7
-    assert body["new_incidents"] == 4
-    assert body["rejected_non_us"] == 2
+    assert body["fetched"] == 9
+    assert body["new_incidents"] == 5
+    assert body["rejected_non_us"] == 3
     assert body["below_min_severity"] == 1
 
     incidents = client.get("/api/incidents").json()
     categories = {i["category"] for i in incidents["items"]}
-    assert categories == {"aviation", "seismic", "tsunami", "rail"}
+    assert categories == {"aviation", "seismic", "tsunami", "rail", "hurricane"}
     rail_incidents = [i for i in incidents["items"] if i["category"] == "rail"]
     assert len(rail_incidents) == 1
     assert rail_incidents[0]["severity"] == "medium"

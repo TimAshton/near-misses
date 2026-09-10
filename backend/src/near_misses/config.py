@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     nws_api_base: str = "https://api.weather.gov"
     nws_user_agent: str = "near-misses-incident-map (https://incidents.tashton.com)"
     fra_api_base: str = "https://data.transportation.gov/resource/85tf-25kj.json"
+    nhc_api_base: str = "https://www.nhc.noaa.gov/CurrentStorms.json"
 
     poll_interval_minutes: int = 5
     scheduler_enabled: bool = True

@@ -1,0 +1,55 @@
+{
+  "activeStorms": [
+    {
+      "id": "al092026",
+      "name": "Milton",
+      "classification": "HU",
+      "intensity": "115",
+      "pressure": "935",
+      "latitudeNumeric": 27.5,
+      "longitudeNumeric": -83.2,
+      "movementDir": 70,
+      "movementSpeed": 12,
+      "lastUpdate": "2026-09-10T15:00:00.000Z",
+      "publicAdvisory": {
+        "advNum": "020",
+        "issuance": "2026-09-10T15:00:00.000Z",
+        "url": "https://www.nhc.noaa.gov/text/MIATCPAT1.shtml"
+      }
+    },
+    {
+      "id": "ep142026",
+      "name": "Norbert",
+      "classification": "TS",
+      "intensity": "35",
+      "pressure": "1003",
+      "latitudeNumeric": 16.5,
+      "longitudeNumeric": -119.3,
+      "movementDir": 275,
+      "movementSpeed": 14,
+      "lastUpdate": "2026-09-10T15:00:00.000Z",
+      "publicAdvisory": {
+        "advNum": "004",
+        "issuance": "2026-09-10T15:00:00.000Z",
+        "url": "https://www.nhc.noaa.gov/text/MIATCPEP4.shtml"
+      }
+    },
+    {
+      "id": "al102026",
+      "name": "Nadine",
+      "classification": "TD",
+      "intensity": "30",
+      "pressure": "1006",
+      "latitudeNumeric": 29.0,
+      "longitudeNumeric": -89.5,
+      "movementDir": 10,
+      "movementSpeed": 5,
+      "lastUpdate": "2026-09-10T15:00:00.000Z",
+      "publicAdvisory": {
+        "advNum": "008",
+        "issuance": "2026-09-10T15:00:00.000Z",
+        "url": "https://www.nhc.noaa.gov/text/MIATCPAT2.shtml"
+      }
+    }
+  ]
+}

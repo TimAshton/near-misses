@@ -30,6 +30,15 @@ def test_normalizes_low_damage_no_casualty_derailment_to_low_severity():
     assert incident.title == "Derailment — Conway, PA"
     assert incident.occurred_at.hour == 22
     assert incident.occurred_at.minute == 56
+    assert incident.description.startswith("Cause: Retarder worn, broken, or malfunctioning.")
+    assert "MALFUNCTIONING RETARDER" in incident.description
+
+
+def test_description_falls_back_to_narrative_only_when_cause_missing():
+    raw = {**_by_key("NS171002202606"), "primaryaccidentcause": None}
+    incident = FraRailNormalizer().normalize(raw)
+    assert not incident.description.startswith("Cause:")
+    assert "MALFUNCTIONING RETARDER" in incident.description
 
 
 def test_normalizes_high_damage_no_casualty_derailment_to_medium_severity():
