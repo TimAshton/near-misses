@@ -24,7 +24,7 @@ near-misses/
     package.json / vite.config.ts / tailwind.config.ts / tsconfig.json / index.html
     src/
       main.tsx, App.tsx
-      routes/            Home.tsx, MapPage.tsx, Dashboard.tsx, Reports.tsx, IncidentDetail.tsx, About.tsx
+      routes/            MapPage.tsx, Dashboard.tsx, Reports.tsx, IncidentDetail.tsx, About.tsx
       components/
         map/             IncidentMap.tsx, IncidentMarker.tsx, FilterPanel.tsx, IncidentPreviewModal.tsx
         dashboard/        StatTile.tsx, TimelineChart.tsx, SeverityBreakdown.tsx, TopStatesTable.tsx, RefreshButton.tsx
@@ -108,7 +108,7 @@ near-misses/
 
 11. **Frontend: Incident Detail (`/incidents/:id`)** — full normalized fields, collapsible `raw` JSON viewer, small Mapbox pin map, link to `source_url`.
 
-12. **Home (`/`) and About (`/about`)** — Home: summary stats from `/api/stats`, links to Map/Dashboard. About: static content — data source attribution (FAA AIDS or NTSB, whichever Step 3 resolves to), refresh cadence (5 min), and an explicit note on data lag (investigation-driven sources like NTSB publish with delay after real-world events — disclose this rather than implying near-real-time coverage).
+12. **About (`/about`)** — About: static content — data source attribution (FAA AIDS or NTSB, whichever Step 3 resolves to), refresh cadence (5 min), and an explicit note on data lag (investigation-driven sources like NTSB publish with delay after real-world events — disclose this rather than implying near-real-time coverage).
 
 13. **Terraform infra (dev environment)** — `modules/network`, `rds`, `ecr`, `ecs` (single ECS service running the FastAPI app with the in-process scheduler — avoids a second task definition for Phase 1), `s3-archive`, `frontend-hosting` (S3 + CloudFront), `iam`. `environments/dev/outputs.tf` producing `frontend_url`, `api_url`, `rds_endpoint` per spec. Terraform applied manually by a human for this phase (no automated deploy pipeline requested).
 

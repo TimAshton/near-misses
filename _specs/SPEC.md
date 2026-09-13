@@ -114,10 +114,15 @@ All data sources write to a shared schema regardless of type:
 
 ## Pages
 
-### `/` — Home
-- Brief description of the project
-- Summary stats (total incidents, last updated, active categories)
-- Quick-access links to Map and Dashboard
+### `/` — Dashboard (home page)
+`/dashboard` redirects here, so older links keep working.
+
+- Incident counts by category
+- Timeline chart (incidents over time)
+- Severity breakdown
+- Top states by incident count
+- Last 24h / 7d / 30d toggles
+- Manual refresh button — triggers an immediate API poll and updates the UI when complete
 
 ### `/map` — Map
 - Full-screen interactive US map
@@ -125,14 +130,6 @@ All data sources write to a shared schema regardless of type:
 - Click icon → modal preview with link to detail page
 - Filter panel: by category, severity, date range
 - Icon placement: exact lat/lng for point incidents, geographic center for area events
-
-### `/dashboard` — Dashboard
-- Incident counts by category
-- Timeline chart (incidents over time)
-- Severity breakdown
-- Top states by incident count
-- Last 24h / 7d / 30d toggles
-- Manual refresh button — triggers an immediate API poll and updates the UI when complete
 
 ### `/reports` — Reporting
 - Tabular view of all incidents

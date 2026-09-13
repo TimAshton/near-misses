@@ -1,9 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const links = [
-  { to: "/", label: "Home" },
+  { to: "/", label: "Dashboard" },
   { to: "/map", label: "Map" },
-  { to: "/dashboard", label: "Dashboard" },
   { to: "/reports", label: "Reports" },
   { to: "/about", label: "About" },
 ];
@@ -11,9 +10,12 @@ const links = [
 export function NavBar() {
   return (
     <header className="flex items-center justify-between border-b border-gray-800 bg-gray-950 px-6 py-3">
-      <span className="text-lg font-semibold tracking-tight text-gray-100">
+      <Link
+        to="/"
+        className="text-lg font-semibold tracking-tight text-gray-100 hover:text-gray-300"
+      >
         US Incident Map
-      </span>
+      </Link>
       <nav className="flex gap-6" data-testid="nav-links">
         {links.map((link) => (
           <NavLink

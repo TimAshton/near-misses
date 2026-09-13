@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("dashboard shows stats, charts, and supports window toggles", async ({ page }) => {
-  await page.goto("/dashboard");
+  await page.goto("/");
 
   await expect(page.getByTestId("stat-total")).toBeVisible();
   await expect(page.getByTestId("timeline-chart")).toBeVisible();
@@ -16,7 +16,7 @@ test("dashboard shows stats, charts, and supports window toggles", async ({ page
 });
 
 test("manual refresh button triggers a poll", async ({ page }) => {
-  await page.goto("/dashboard");
+  await page.goto("/");
   const button = page.getByTestId("refresh-button");
   await button.click();
   // Button reflects a loading state immediately, then returns to idle once the poll completes.
