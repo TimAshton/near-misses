@@ -39,7 +39,16 @@ jobs:
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      # Left empty (same-origin): CloudFront routes /api/* and /ws to the
+      # backend ALB on the same domain (see infra/terraform/modules/
+      # frontend-hosting), so the built app should never call localhost:8000.
+      # Manual builds picked this up from a local, gitignored
+      # frontend/.env.production — set it explicitly here too now that CI
+      # builds the production bundle instead.
       - run: npm run build
+        env:
+          VITE_API_URL: ""
+          VITE_WS_URL: ""
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
