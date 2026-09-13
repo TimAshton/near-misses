@@ -9,6 +9,7 @@ const CATEGORY_GLYPH: Record<string, string> = {
   hurricane: "🌀",
   wildfire: "🔥",
   maritime: "⚓",
+  severe_weather: "⚡",
 };
 
 interface IncidentMarkerElementProps {

@@ -9,6 +9,8 @@ from near_misses.ingestion.noaa_incidentnews.client import NoaaIncidentNewsClien
 from near_misses.ingestion.noaa_incidentnews.normalizer import NoaaIncidentNewsNormalizer
 from near_misses.ingestion.ntsb.client import NtsbClient
 from near_misses.ingestion.ntsb.normalizer import NtsbNormalizer
+from near_misses.ingestion.nws_severe_weather.client import NwsSevereWeatherClient
+from near_misses.ingestion.nws_severe_weather.normalizer import NwsSevereWeatherNormalizer
 from near_misses.ingestion.nws_tsunami.client import NwsTsunamiClient
 from near_misses.ingestion.nws_tsunami.normalizer import NwsTsunamiNormalizer
 from near_misses.ingestion.usgs.client import UsgsClient
@@ -29,4 +31,5 @@ def all_sources() -> list[tuple[SourceClient, Normalizer]]:
         (NhcHurricaneClient(), NhcHurricaneNormalizer()),
         (NifcWildfireClient(), NifcWildfireNormalizer()),
         (NoaaIncidentNewsClient(), NoaaIncidentNewsNormalizer()),
+        (NwsSevereWeatherClient(), NwsSevereWeatherNormalizer()),
     ]

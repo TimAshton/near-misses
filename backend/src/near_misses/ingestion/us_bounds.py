@@ -29,7 +29,14 @@ _WATER_BOXES = [
 ]
 
 # Categories that legitimately occur over open water, not just on land.
-_WATER_INCLUDED_CATEGORIES = {Category.hurricane, Category.tsunami, Category.maritime}
+# severe_weather is included too — NWS issues Extreme-severity alerts (storm
+# surge, hurricane-force wind, ...) for offshore marine zones, not just land.
+_WATER_INCLUDED_CATEGORIES = {
+    Category.hurricane,
+    Category.tsunami,
+    Category.maritime,
+    Category.severe_weather,
+}
 
 
 def _in_any(lat: float, lng: float, boxes: list[tuple[float, float, float, float]]) -> bool:

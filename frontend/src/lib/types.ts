@@ -5,7 +5,8 @@ export type Category =
   | "tsunami"
   | "hurricane"
   | "wildfire"
-  | "maritime";
+  | "maritime"
+  | "severe_weather";
 
 export type Severity = "low" | "medium" | "high" | "critical";
 

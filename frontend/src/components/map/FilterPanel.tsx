@@ -8,6 +8,7 @@ const CATEGORIES: Category[] = [
   "hurricane",
   "wildfire",
   "maritime",
+  "severe_weather",
 ];
 const SEVERITIES: Severity[] = ["low", "medium", "high", "critical"];
 

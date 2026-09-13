@@ -23,6 +23,10 @@ MIN_SEVERITY_BY_CATEGORY: dict[Category, Severity] = {
     # starting point (same as rail/seismic originally were), may need
     # tightening to high once real-world noise is visible on the map.
     Category.maritime: Severity.medium,
+    # Backstop, not the primary filter — the source itself only fetches
+    # severity=Extreme alerts, so almost everything here is critical
+    # already (see nws_severe_weather/README.md).
+    Category.severe_weather: Severity.critical,
 }
 
 

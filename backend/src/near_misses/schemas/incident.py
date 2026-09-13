@@ -13,6 +13,7 @@ class Category(StrEnum):
     hurricane = "hurricane"
     wildfire = "wildfire"
     maritime = "maritime"
+    severe_weather = "severe_weather"
 
 
 class Severity(StrEnum):

@@ -35,7 +35,7 @@ def _mock_response(payload):
 
 
 def test_enriches_geometry_less_alerts_with_zone_centroid_and_caches_per_zone():
-    with patch("near_misses.ingestion.nws_tsunami.client.httpx.get") as mock_get:
+    with patch("near_misses.ingestion.nws_alerts.httpx.get") as mock_get:
         mock_get.side_effect = [
             _mock_response(ALERTS_RESPONSE),
             _mock_response(ZONE_RESPONSE),  # only one zone lookup for AKZ185, shared by a1/a2

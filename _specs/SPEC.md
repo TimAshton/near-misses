@@ -46,6 +46,7 @@ A large-screen web application that overlays publicly available US incident data
 | 5 | Hurricanes | NOAA National Hurricane Center API |
 | 6 (added post-launch, not in original plan) | Wildfires | NIFC WFIGS current wildland fire incidents |
 | 7 (added post-launch, not in original plan) | Maritime accidents | NOAA IncidentNews (vessel casualties/spills in US waters) |
+| 8 (added post-launch, not in original plan) | Severe weather | NOAA/NWS alerts (Extreme severity only) |
 
 For incidents covering large land areas (hurricanes, seismic zones), place the icon at the geographic center of the affected region.
 
@@ -58,8 +59,8 @@ All data sources write to a shared schema regardless of type:
 ```json
 {
   "id": "uuid",
-  "source": "faa | ntsb | fra | usgs | noaa-tsunami | noaa-hurricane | nifc-wildfire | noaa-incidentnews",
-  "category": "aviation | rail | seismic | tsunami | hurricane | wildfire | maritime",
+  "source": "faa | ntsb | fra | usgs | noaa-tsunami | noaa-hurricane | nifc-wildfire | noaa-incidentnews | noaa-severe-weather",
+  "category": "aviation | rail | seismic | tsunami | hurricane | wildfire | maritime | severe_weather",
   "event_type": "string",
   "severity": "low | medium | high | critical",
   "title": "string",

@@ -34,6 +34,7 @@ def test_water_categories_accept_us_approach_waters():
         assert is_us_location(Category.hurricane, lat, lng) is True
         assert is_us_location(Category.tsunami, lat, lng) is True
         assert is_us_location(Category.maritime, lat, lng) is True
+        assert is_us_location(Category.severe_weather, lat, lng) is True
 
 
 def test_water_categories_still_reject_far_offshore():

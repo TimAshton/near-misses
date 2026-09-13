@@ -30,6 +30,13 @@ def test_wildfire_requires_critical():
     assert meets_minimum_severity(Category.wildfire, Severity.critical)
 
 
+def test_severe_weather_requires_critical():
+    assert not meets_minimum_severity(Category.severe_weather, Severity.low)
+    assert not meets_minimum_severity(Category.severe_weather, Severity.medium)
+    assert not meets_minimum_severity(Category.severe_weather, Severity.high)
+    assert meets_minimum_severity(Category.severe_weather, Severity.critical)
+
+
 def test_categories_without_a_policy_allow_every_severity():
     assert meets_minimum_severity(Category.aviation, Severity.low)
     assert meets_minimum_severity(Category.tsunami, Severity.low)

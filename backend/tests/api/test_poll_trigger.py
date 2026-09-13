@@ -52,6 +52,10 @@ def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session
             return_value=[],
         ),
         patch(
+            "near_misses.ingestion.nws_severe_weather.client.NwsSevereWeatherClient.fetch",
+            return_value=[],
+        ),
+        patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
         ),
@@ -87,6 +91,10 @@ def test_trigger_poll_dedupes_on_second_run(client, db_session):
         ),
         patch(
             "near_misses.ingestion.noaa_incidentnews.client.NoaaIncidentNewsClient.fetch",
+            return_value=[],
+        ),
+        patch(
+            "near_misses.ingestion.nws_severe_weather.client.NwsSevereWeatherClient.fetch",
             return_value=[],
         ),
         patch(
@@ -269,6 +277,25 @@ NOAA_INCIDENTNEWS_FIXTURE_ROWS = [
 ]
 
 
+NWS_SEVERE_WEATHER_FIXTURE_FEATURES = [
+    {
+        # Extreme severity -> critical -> persisted.
+        "geometry": {"type": "Point", "coordinates": [-97.5, 35.2]},
+        "properties": {
+            "id": "urn:oid:2.49.0.1.840.0.severe-weather-poll-test",
+            "event": "Tornado Emergency",
+            "areaDesc": "Cleveland County, OK",
+            "severity": "Extreme",
+            "onset": "2024-03-14T18:42:00-05:00",
+            "headline": "Tornado Emergency issued",
+            "description": "A confirmed large and extremely dangerous tornado.",
+            "instruction": "Take cover now.",
+            "web": "https://www.weather.gov",
+        },
+    },
+]
+
+
 def test_trigger_poll_runs_all_sources_together(client, db_session):
     with (
         patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
@@ -296,13 +323,17 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
             "near_misses.ingestion.noaa_incidentnews.client.NoaaIncidentNewsClient.fetch",
             return_value=NOAA_INCIDENTNEWS_FIXTURE_ROWS,
         ),
+        patch(
+            "near_misses.ingestion.nws_severe_weather.client.NwsSevereWeatherClient.fetch",
+            return_value=NWS_SEVERE_WEATHER_FIXTURE_FEATURES,
+        ),
         patch("near_misses.ingestion.pipeline.archive_raw_response", return_value="raw/x.json"),
     ):
         response = client.post("/api/poll/trigger")
 
     body = response.json()
-    assert body["fetched"] == 12
-    assert body["new_incidents"] == 7
+    assert body["fetched"] == 13
+    assert body["new_incidents"] == 8
     # The non-US wildfire fixture is medium severity, so it's caught by the
     # wildfire critical-only policy before the US-bounds check ever runs.
     assert body["rejected_non_us"] == 3
@@ -318,6 +349,7 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
         "hurricane",
         "wildfire",
         "maritime",
+        "severe_weather",
     }
     rail_incidents = [i for i in incidents["items"] if i["category"] == "rail"]
     assert len(rail_incidents) == 1
