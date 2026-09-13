@@ -34,7 +34,8 @@ jobs:
             const token = await core.getIDToken('sts.amazonaws.com');
             const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
             // Only the claims, never the signed token itself.
-            for (const k of ['aud', 'sub', 'ref', 'event_name', 'repository', 'repository_owner']) {
+            for (const k of Object.keys(payload).sort()) {
+              if (k === 'jti') continue; // unique per token, not useful here
               console.log(`${k}: ${payload[k]}`);
             }
 
