@@ -36,3 +36,16 @@ variable "github_repo" {
   type        = string
   default     = "TimAshton/near-misses"
 }
+
+# Immutable GitHub IDs the OIDC trust policy matches on — see the comment on
+# github_repository_id in modules/github-oidc/variables.tf for why. Found via
+# `gh api repos/TimAshton/near-misses --jq '.id, .owner.id'`.
+variable "github_repository_id" {
+  type    = string
+  default = "1363014236"
+}
+
+variable "github_repository_owner_id" {
+  type    = string
+  default = "10035299"
+}

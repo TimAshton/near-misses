@@ -172,6 +172,8 @@ module "github_oidc" {
 
   name                        = local.name
   github_repo                 = var.github_repo
+  github_repository_id        = var.github_repository_id
+  github_repository_owner_id  = var.github_repository_owner_id
   ecr_repository_arn          = module.ecr.repository_arn
   s3_bucket_arn               = module.frontend_hosting.bucket_arn
   cloudfront_distribution_arn = module.frontend_hosting.distribution_arn

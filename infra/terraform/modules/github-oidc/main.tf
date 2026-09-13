@@ -27,12 +27,37 @@ data "aws_iam_policy_document" "assume" {
       values   = ["sts.amazonaws.com"]
     }
 
-    # Restricts to a single repo + branch — a workflow run from a fork or a
-    # PR branch cannot assume this role, only a push that lands on main.
+    # Restricts to this repo + branch, matched on the immutable numeric IDs
+    # (not name/sub-string matching — see the variable comments) — a workflow
+    # run from a fork, a different repo, or a PR branch cannot assume this
+    # role, only a push that lands on this repo's main branch.
     condition {
       test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:${var.allowed_ref}"]
+      variable = "token.actions.githubusercontent.com:repository_id"
+      values   = [var.github_repository_id]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:repository_owner_id"
+      values   = [var.github_repository_owner_id]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:ref"
+      values   = [var.allowed_ref]
+    }
+
+    # AWS requires a GitHub-OIDC trust policy to condition on sub or
+    # job_workflow_ref specifically (a bare aud/repository_id/ref set is
+    # rejected as "not scoped to all") — job_workflow_ref is the tighter of
+    # the two, since it also pins down which workflow file can assume this
+    # role, not just which repo/branch.
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:job_workflow_ref"
+      values   = ["${var.github_repo}/${var.deploy_workflow_path}@${var.allowed_ref}"]
     }
   }
 }
