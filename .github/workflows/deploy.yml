@@ -7,6 +7,9 @@ on:
     workflows: ["CI"]
     types: [completed]
     branches: [main]
+  # Lets a deploy be re-run on demand (e.g. after fixing the AWS role)
+  # without needing a new commit to retrigger CI first.
+  workflow_dispatch: {}
 
 # Only one deploy in flight — a second push landing mid-deploy waits
 # rather than racing the first one onto the same ECS service / S3 bucket.
@@ -19,9 +22,25 @@ permissions:
   contents: read
 
 jobs:
+  debug-oidc:
+    name: Print OIDC token claims (manual runs only)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decode the sts.amazonaws.com ID token
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+            const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+            // Only the claims, never the signed token itself.
+            for (const k of ['aud', 'sub', 'ref', 'event_name', 'repository', 'repository_owner']) {
+              console.log(`${k}: ${payload[k]}`);
+            }
+
   frontend:
     name: Deploy frontend (S3 + CloudFront)
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -29,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -51,12 +70,12 @@ jobs:
 
   backend:
     name: Deploy backend (ECR + ECS)
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
@@ -68,7 +87,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.ecr.outputs.registry }}
           REPOSITORY: ${{ vars.ECR_REPOSITORY }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           docker build -t "$REGISTRY/$REPOSITORY:$SHA" -t "$REGISTRY/$REPOSITORY:latest" .
           docker push "$REGISTRY/$REPOSITORY:$SHA"
