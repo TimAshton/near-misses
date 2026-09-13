@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { LocationPreviewMap } from "../components/map/LocationPreviewMap";
 import { PageShell } from "../components/layout/PageShell";
 import { fetchIncident } from "../lib/api";
 import type { Incident } from "../lib/types";
 import { formatDateTime, severityLabel } from "../lib/formatters";
+import { googleMapsUrl, streetViewUrl } from "../lib/mapLinks";
 
 export function IncidentDetail() {
   const { id } = useParams<{ id: string }>();
@@ -93,13 +95,36 @@ export function IncidentDetail() {
           </a>
         </div>
 
-        <div className="col-span-1">
+        <div className="col-span-1 space-y-2">
           <div
             data-testid="incident-pin-map"
-            className="h-64 w-full rounded-lg border border-gray-800 bg-gray-900 p-4 text-sm text-gray-500"
+            className="h-64 w-full overflow-hidden rounded-lg border border-gray-800"
           >
-            Map pin: {incident.location.lat.toFixed(4)}, {incident.location.lng.toFixed(4)}
+            <LocationPreviewMap lat={incident.location.lat} lng={incident.location.lng} />
           </div>
+          <div className="flex flex-col gap-1 text-sm">
+            <a
+              href={streetViewUrl(incident.location.lat, incident.location.lng)}
+              target="_blank"
+              rel="noreferrer"
+              data-testid="incident-street-view-link"
+              className="font-medium text-blue-400 hover:text-blue-300"
+            >
+              Open Street View →
+            </a>
+            <a
+              href={googleMapsUrl(incident.location.lat, incident.location.lng)}
+              target="_blank"
+              rel="noreferrer"
+              data-testid="incident-google-maps-link"
+              className="font-medium text-blue-400 hover:text-blue-300"
+            >
+              Open in Google Maps →
+            </a>
+          </div>
+          {/* No API key needed for either link above (or the mini-map) —
+              real street-level photos require a billing-enabled Google/
+              Mapbox account, which this project avoids (see SPEC.md). */}
         </div>
       </div>
     </PageShell>

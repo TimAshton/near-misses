@@ -9,6 +9,14 @@ test("incident detail page shows normalized fields, raw data, and source link", 
 
   await expect(page).toHaveURL(/\/incidents\//);
   await expect(page.getByTestId("incident-pin-map")).toBeVisible();
+  await expect(page.getByTestId("incident-street-view-link")).toHaveAttribute(
+    "href",
+    /google\.com\/maps\?layer=c&cbll=/,
+  );
+  await expect(page.getByTestId("incident-google-maps-link")).toHaveAttribute(
+    "href",
+    /google\.com\/maps\?q=/,
+  );
 
   const fields = page.getByTestId("incident-fields");
   await expect(fields.getByText("Category")).toBeVisible();
