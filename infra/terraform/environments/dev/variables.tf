@@ -30,3 +30,9 @@ variable "domain_name" {
   type        = string
   default     = "incidents.tashton.com"
 }
+
+variable "github_repo" {
+  description = "GitHub repo (owner/name) allowed to assume the CI deploy role via OIDC"
+  type        = string
+  default     = "TimAshton/near-misses"
+}

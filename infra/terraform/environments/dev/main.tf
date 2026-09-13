@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.6"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
   }
 }
 
@@ -39,6 +43,8 @@ provider "aws" {
     }
   }
 }
+
+data "aws_caller_identity" "current" {}
 
 locals {
   name = "${var.project_name}-${var.environment}"
@@ -159,4 +165,15 @@ module "ecs" {
   secrets = {
     DB_SECRET_JSON = module.rds.secret_arn
   }
+}
+
+module "github_oidc" {
+  source = "../../modules/github-oidc"
+
+  name                        = local.name
+  github_repo                 = var.github_repo
+  ecr_repository_arn          = module.ecr.repository_arn
+  s3_bucket_arn               = module.frontend_hosting.bucket_arn
+  cloudfront_distribution_arn = module.frontend_hosting.distribution_arn
+  ecs_service_arn             = "arn:aws:ecs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:service/${module.ecs.cluster_name}/${module.ecs.service_name}"
 }
