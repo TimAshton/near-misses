@@ -101,6 +101,14 @@ resource "aws_ecs_service" "api" {
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
+  # Lets `aws ecs execute-command` open a shell in the running task over
+  # SSM — the only way to reach the private-subnet-only RDS instance for
+  # one-off admin tasks (no bastion/VPN in this infra, and the DB should
+  # stay off the public internet). Requires the task role's SSM messaging
+  # permissions (see modules/iam) and only takes effect on tasks started
+  # after this is enabled, hence the forced redeployment below.
+  enable_execute_command = true
+
   network_configuration {
     subnets          = var.private_subnet_ids
     security_groups  = [var.ecs_sg_id]

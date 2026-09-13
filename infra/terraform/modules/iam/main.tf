@@ -61,6 +61,21 @@ data "aws_iam_policy_document" "task_permissions" {
     actions   = ["secretsmanager:GetSecretValue"]
     resources = [var.rds_secret_arn]
   }
+
+  # Required for `aws ecs execute-command` (ECS Exec) to open a shell in
+  # the running task over SSM — see the enable_execute_command comment in
+  # modules/ecs. These actions don't support resource-level scoping.
+  statement {
+    sid    = "EcsExecSsmChannel"
+    effect = "Allow"
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel",
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_role_policy" "task_permissions" {
