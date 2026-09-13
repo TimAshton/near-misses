@@ -18,6 +18,26 @@ export function formatRelative(iso: string): string {
   return `${days}d ago`;
 }
 
+const MS_PER_DAY = 86_400_000;
+
+/** ISO yyyy-mm-dd for the date `daysAgo` days before today (0 = today). */
+export function isoDateDaysAgo(daysAgo: number): string {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString().slice(0, 10);
+}
+
+/** Inverse of isoDateDaysAgo: how many days before today an ISO date falls,
+ * clamped to [0, maxDays] so it always maps to a valid slider position. */
+export function daysAgoFromIsoDate(iso: string, maxDays: number): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(`${iso}T00:00:00`);
+  const days = Math.round((today.getTime() - target.getTime()) / MS_PER_DAY);
+  return Math.min(Math.max(days, 0), maxDays);
+}
+
 export const SEVERITY_COLOR: Record<Severity, string> = {
   low: "#22c55e",
   medium: "#eab308",

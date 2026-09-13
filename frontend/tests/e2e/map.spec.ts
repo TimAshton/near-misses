@@ -22,3 +22,18 @@ test("map filter panel updates category filter", async ({ page }) => {
   await page.getByTestId("filter-category").selectOption("aviation");
   await expect(page.getByTestId("filter-category")).toHaveValue("aviation");
 });
+
+test("search start slider moves the From date backward and updates the date field", async ({
+  page,
+}) => {
+  await page.goto("/map");
+  const slider = page.getByTestId("filter-date-from-slider");
+  await expect(slider).toBeVisible();
+
+  const before = await page.getByTestId("filter-date-from").inputValue();
+  await slider.fill("365"); // drag halfway back toward "365 days ago"
+  const after = await page.getByTestId("filter-date-from").inputValue();
+
+  expect(after).not.toBe(before);
+  expect(new Date(after).getTime()).toBeLessThan(Date.now());
+});
