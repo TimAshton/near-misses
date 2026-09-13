@@ -4,6 +4,7 @@ import { StatTile } from "../components/dashboard/StatTile";
 import { TimelineChart } from "../components/dashboard/TimelineChart";
 import { SeverityBreakdown } from "../components/dashboard/SeverityBreakdown";
 import { TopStatesTable } from "../components/dashboard/TopStatesTable";
+import { WildfireTrendPanel } from "../components/dashboard/WildfireTrendPanel";
 import { RefreshButton } from "../components/dashboard/RefreshButton";
 import { fetchStats } from "../lib/api";
 import type { Stats, StatsWindow } from "../lib/types";
@@ -11,12 +12,18 @@ import { formatRelative } from "../lib/formatters";
 
 const WINDOWS: StatsWindow[] = ["24h", "7d", "30d"];
 
+// Independent of the window toggle above — spotting an upswing/downswing in
+// new fire counts needs a longer, fixed horizon, not a 24h/7d/30d snapshot.
+const WILDFIRE_TREND_WINDOW: StatsWindow = "90d";
+
 export function Dashboard() {
   const [window_, setWindow] = useState<StatsWindow>("24h");
   const [stats, setStats] = useState<Stats | null>(null);
+  const [wildfireTrend, setWildfireTrend] = useState<Stats | null>(null);
 
   function load() {
     fetchStats(window_).then(setStats).catch(() => setStats(null));
+    fetchStats(WILDFIRE_TREND_WINDOW, "wildfire").then(setWildfireTrend).catch(() => setWildfireTrend(null));
   }
 
   useEffect(load, [window_]);
@@ -68,7 +75,10 @@ export function Dashboard() {
         <SeverityBreakdown data={stats?.by_severity ?? {}} />
       </div>
 
-      <TopStatesTable data={stats?.top_states ?? []} />
+      <div className="mb-6 grid grid-cols-2 gap-4">
+        <WildfireTrendPanel data={wildfireTrend?.timeline ?? []} />
+        <TopStatesTable data={stats?.top_states ?? []} />
+      </div>
     </PageShell>
   );
 }

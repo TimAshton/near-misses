@@ -7,6 +7,10 @@ test("dashboard shows stats, charts, and supports window toggles", async ({ page
   await expect(page.getByTestId("timeline-chart")).toBeVisible();
   await expect(page.getByTestId("severity-breakdown")).toBeVisible();
   await expect(page.getByTestId("top-states-table")).toBeVisible();
+  await expect(page.getByTestId("wildfire-trend-panel")).toBeVisible();
+  await expect(page.getByTestId("wildfire-trend-direction")).toContainText(
+    /Upswing|Downswing|Steady/,
+  );
 
   await page.getByTestId("window-7d").click();
   await expect(page.getByTestId("window-7d")).toHaveClass(/bg-blue-600/);

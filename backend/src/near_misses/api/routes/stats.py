@@ -14,16 +14,23 @@ _WINDOWS = {
     "24h": timedelta(hours=24),
     "7d": timedelta(days=7),
     "30d": timedelta(days=30),
+    "90d": timedelta(days=90),
     "all": None,
 }
 
 
 @router.get("", response_model=Stats)
-def get_stats(window: str = Query(default="7d"), db: Session = Depends(get_db)):
+def get_stats(
+    window: str = Query(default="7d"),
+    category: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+):
     delta = _WINDOWS.get(window, _WINDOWS["7d"])
     base = select(Incident)
     if delta is not None:
         base = base.where(Incident.occurred_at >= datetime.now(UTC) - delta)
+    if category:
+        base = base.where(Incident.category == category)
 
     incidents = db.execute(base).scalars().all()
 

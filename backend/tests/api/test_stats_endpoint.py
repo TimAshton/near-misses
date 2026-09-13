@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 
+from near_misses.api.routes.stats import _WINDOWS
 from near_misses.models.incident import Incident
 
 
@@ -45,3 +46,19 @@ def test_stats_window_excludes_old_incidents(client, db_session):
     response = client.get("/api/stats", params={"window": "24h"})
     body = response.json()
     assert body["total_incidents"] == 1
+
+
+def test_stats_filters_by_category(client, db_session):
+    _seed(db_session, source_id="W1", category="wildfire")
+    _seed(db_session, source_id="A1", category="aviation")
+
+    response = client.get("/api/stats", params={"window": "all", "category": "wildfire"})
+    body = response.json()
+
+    assert body["total_incidents"] == 1
+    assert body["by_category"] == {"wildfire": 1}
+
+
+def test_stats_supports_90d_window():
+    assert "90d" in _WINDOWS
+    assert _WINDOWS["90d"].days == 90

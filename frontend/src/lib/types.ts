@@ -52,7 +52,7 @@ export interface IncidentFilters {
   order?: "asc" | "desc";
 }
 
-export type StatsWindow = "24h" | "7d" | "30d";
+export type StatsWindow = "24h" | "7d" | "30d" | "90d";
 
 export interface TimelinePoint {
   bucket: string; // ISO8601 date/time bucket

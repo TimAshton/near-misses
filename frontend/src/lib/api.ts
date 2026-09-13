@@ -1,4 +1,5 @@
 import type {
+  Category,
   Incident,
   IncidentListResponse,
   IncidentFilters,
@@ -46,8 +47,8 @@ export function fetchIncident(id: string): Promise<Incident> {
   return request<Incident>(`/api/incidents/${id}`);
 }
 
-export function fetchStats(window: StatsWindow = "24h"): Promise<Stats> {
-  return request<Stats>(`/api/stats${buildQuery({ window })}`);
+export function fetchStats(window: StatsWindow = "24h", category?: Category): Promise<Stats> {
+  return request<Stats>(`/api/stats${buildQuery({ window, category })}`);
 }
 
 export function triggerPoll(): Promise<PollTriggerResponse> {
