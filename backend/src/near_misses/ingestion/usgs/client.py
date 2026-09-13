@@ -5,12 +5,12 @@ import httpx
 from near_misses.config import settings
 
 # Keep in sync with normalizer.py's magnitude->severity mapping: this is the
-# low/medium boundary, so anything below it is excluded here rather than
-# ingested as a "low" severity earthquake. The feed URL (see config.py) is
-# already pre-filtered to 2.5+ server-side, but its boundary isn't exact
-# (observed magnitudes just under 2.5 slipping through), so this is enforced
-# again client-side.
-MIN_TRACKED_MAGNITUDE = 2.5
+# medium/high boundary, so anything below it is excluded here rather than
+# ingested as a medium (or lower) severity earthquake that severity_policy
+# would just filter out post-normalization anyway. The feed URL (see
+# config.py) is only pre-filtered to 2.5+ server-side, so this is enforced
+# again client-side at the real threshold.
+MIN_TRACKED_MAGNITUDE = 4.5
 
 
 class UsgsClient:

@@ -15,7 +15,7 @@ from near_misses.schemas.incident import Category, Severity
 _SEVERITY_ORDER = [Severity.low, Severity.medium, Severity.high, Severity.critical]
 
 MIN_SEVERITY_BY_CATEGORY: dict[Category, Severity] = {
-    Category.seismic: Severity.medium,
+    Category.seismic: Severity.high,
     Category.rail: Severity.medium,
     Category.wildfire: Severity.critical,
 }
