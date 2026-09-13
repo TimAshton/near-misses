@@ -18,6 +18,11 @@ MIN_SEVERITY_BY_CATEGORY: dict[Category, Severity] = {
     Category.seismic: Severity.high,
     Category.rail: Severity.medium,
     Category.wildfire: Severity.critical,
+    # NOAA IncidentNews includes a lot of unconfirmed/untraced "mystery
+    # sheen" reports with no real damage yet established — medium+ is a
+    # starting point (same as rail/seismic originally were), may need
+    # tightening to high once real-world noise is visible on the map.
+    Category.maritime: Severity.medium,
 }
 
 

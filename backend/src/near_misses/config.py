@@ -41,6 +41,7 @@ class Settings(BaseSettings):
         "https://services3.arcgis.com/T4QMspbfLg3qTGWY/arcgis/rest/services/"
         "WFIGS_Incident_Locations_Current/FeatureServer/0/query"
     )
+    noaa_incidentnews_api_base: str = "https://incidentnews.noaa.gov/raw/incidents.csv"
 
     poll_interval_minutes: int = 5
     scheduler_enabled: bool = True

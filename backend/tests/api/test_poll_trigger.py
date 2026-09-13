@@ -48,6 +48,10 @@ def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session
             "near_misses.ingestion.nifc_wildfire.client.NifcWildfireClient.fetch", return_value=[]
         ),
         patch(
+            "near_misses.ingestion.noaa_incidentnews.client.NoaaIncidentNewsClient.fetch",
+            return_value=[],
+        ),
+        patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
             return_value="raw/ntsb/x.json",
         ),
@@ -80,6 +84,10 @@ def test_trigger_poll_dedupes_on_second_run(client, db_session):
         ),
         patch(
             "near_misses.ingestion.nifc_wildfire.client.NifcWildfireClient.fetch", return_value=[]
+        ),
+        patch(
+            "near_misses.ingestion.noaa_incidentnews.client.NoaaIncidentNewsClient.fetch",
+            return_value=[],
         ),
         patch(
             "near_misses.ingestion.pipeline.archive_raw_response",
@@ -244,6 +252,23 @@ NIFC_WILDFIRE_FIXTURE_FEATURES = [
 ]
 
 
+NOAA_INCIDENTNEWS_FIXTURE_ROWS = [
+    {
+        # Known gallons -> medium severity -> persisted.
+        "id": "11212",
+        "open_date": "2024-03-14",
+        "name": "Sunken Vessel at Boat Ramp",
+        "location": "Moss Landing, CA",
+        "lat": "36.811476",
+        "lon": "-121.786806",
+        "threat": "Oil",
+        "tags": "",
+        "max_ptl_release_gallons": "5000",
+        "description": "A vessel sank, discharging diesel.",
+    },
+]
+
+
 def test_trigger_poll_runs_all_sources_together(client, db_session):
     with (
         patch("near_misses.ingestion.ntsb.client.NtsbClient.fetch", return_value=FIXTURE_RECORDS),
@@ -267,13 +292,17 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
             "near_misses.ingestion.nifc_wildfire.client.NifcWildfireClient.fetch",
             return_value=NIFC_WILDFIRE_FIXTURE_FEATURES,
         ),
+        patch(
+            "near_misses.ingestion.noaa_incidentnews.client.NoaaIncidentNewsClient.fetch",
+            return_value=NOAA_INCIDENTNEWS_FIXTURE_ROWS,
+        ),
         patch("near_misses.ingestion.pipeline.archive_raw_response", return_value="raw/x.json"),
     ):
         response = client.post("/api/poll/trigger")
 
     body = response.json()
-    assert body["fetched"] == 11
-    assert body["new_incidents"] == 6
+    assert body["fetched"] == 12
+    assert body["new_incidents"] == 7
     # The non-US wildfire fixture is medium severity, so it's caught by the
     # wildfire critical-only policy before the US-bounds check ever runs.
     assert body["rejected_non_us"] == 3
@@ -281,7 +310,15 @@ def test_trigger_poll_runs_all_sources_together(client, db_session):
 
     incidents = client.get("/api/incidents").json()
     categories = {i["category"] for i in incidents["items"]}
-    assert categories == {"aviation", "seismic", "tsunami", "rail", "hurricane", "wildfire"}
+    assert categories == {
+        "aviation",
+        "seismic",
+        "tsunami",
+        "rail",
+        "hurricane",
+        "wildfire",
+        "maritime",
+    }
     rail_incidents = [i for i in incidents["items"] if i["category"] == "rail"]
     assert len(rail_incidents) == 1
     assert rail_incidents[0]["severity"] == "medium"

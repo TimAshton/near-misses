@@ -43,7 +43,8 @@ async def run_ingestion(
             below_min_severity_count += 1
             continue
 
-        if not is_us_location(normalized.location.lat, normalized.location.lng):
+        location = normalized.location
+        if not is_us_location(normalized.category, location.lat, location.lng):
             rejected_count += 1
             continue
 

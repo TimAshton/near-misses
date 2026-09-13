@@ -9,6 +9,13 @@ def test_rail_requires_medium_or_higher():
     assert meets_minimum_severity(Category.rail, Severity.critical)
 
 
+def test_maritime_requires_medium_or_higher():
+    assert not meets_minimum_severity(Category.maritime, Severity.low)
+    assert meets_minimum_severity(Category.maritime, Severity.medium)
+    assert meets_minimum_severity(Category.maritime, Severity.high)
+    assert meets_minimum_severity(Category.maritime, Severity.critical)
+
+
 def test_seismic_requires_high_or_higher():
     assert not meets_minimum_severity(Category.seismic, Severity.low)
     assert not meets_minimum_severity(Category.seismic, Severity.medium)

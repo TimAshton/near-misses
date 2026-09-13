@@ -8,9 +8,9 @@ export function About() {
           <h2 className="mb-1 text-base font-semibold text-gray-100">Project</h2>
           <p>
             US Incident Map overlays publicly available US incident data — aviation, rail,
-            seismic, tsunami, hurricane, and wildfire — onto an interactive map. Data is polled
-            from free public APIs, normalized to a shared schema, and stored persistently. No
-            authentication is required to view the site.
+            seismic, tsunami, hurricane, wildfire, and maritime — onto an interactive map. Data is
+            polled from free public APIs, normalized to a shared schema, and stored persistently.
+            No authentication is required to view the site.
           </p>
         </section>
 
@@ -18,13 +18,16 @@ export function About() {
           <h2 className="mb-1 text-base font-semibold text-gray-100">Data sources &amp; attribution</h2>
           <p>
             Aviation incidents are sourced from the NTSB accident/incident database, with FAA data
-            incorporated where it is publicly accessible. Earthquakes (magnitude 2.5+) come from
+            incorporated where it is publicly accessible. Earthquakes (magnitude 4.5+) come from
             the USGS Earthquake Hazards Program. Tsunami warnings/watches/advisories come from
             NOAA/NWS's public alerts feed. Rail equipment accidents/incidents come from FRA's Form
             54 data. Hurricanes and tropical storms come from NOAA's National Hurricane Center.
             Wildfires come from NIFC's (National Interagency Fire Center) WFIGS incident feed.
-            All raw source records are retained for auditing and can be viewed on each incident's
-            detail page.
+            Maritime accidents (vessel groundings, collisions, and other casualties resulting in a
+            spill) come from NOAA's IncidentNews log. Hurricane and tsunami coverage extends into
+            the surrounding US territorial/EEZ waters a storm or wave crosses before reaching
+            shore, not just landfall. All raw source records are retained for auditing and can be
+            viewed on each incident's detail page.
           </p>
         </section>
 
@@ -37,7 +40,9 @@ export function About() {
             to months — the 5-minute poll interval reflects how quickly newly published records are
             picked up, not how quickly incidents occurred. Earthquake, tsunami, hurricane, and
             wildfire data is different: those sources reflect live/current conditions with no
-            investigation lag, so the 5-minute interval there is close to real-time.
+            investigation lag, so the 5-minute interval there is close to real-time. Maritime data
+            falls in between: NOAA typically logs an incident within days of being notified, not
+            months, but not instantly either.
           </p>
         </section>
       </div>

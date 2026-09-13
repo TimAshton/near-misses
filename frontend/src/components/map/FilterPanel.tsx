@@ -1,6 +1,14 @@
 import type { Category, IncidentFilters, Severity } from "../../lib/types";
 
-const CATEGORIES: Category[] = ["aviation", "rail", "seismic", "tsunami", "hurricane", "wildfire"];
+const CATEGORIES: Category[] = [
+  "aviation",
+  "rail",
+  "seismic",
+  "tsunami",
+  "hurricane",
+  "wildfire",
+  "maritime",
+];
 const SEVERITIES: Severity[] = ["low", "medium", "high", "critical"];
 
 interface FilterPanelProps {
