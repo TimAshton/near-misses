@@ -4,7 +4,6 @@ import { IncidentTable } from "../components/reports/IncidentTable";
 import { CsvExportButton } from "../components/reports/CsvExportButton";
 import { FilterPanel } from "../components/map/FilterPanel";
 import { useIncidents } from "../hooks/useIncidents";
-import { isoDateDaysAgo } from "../lib/formatters";
 import type { IncidentFilters } from "../lib/types";
 
 export function Reports() {
@@ -12,7 +11,6 @@ export function Reports() {
     limit: 100,
     sort: "occurred_at",
     order: "desc",
-    date_from: isoDateDaysAgo(1),
   });
   const { incidents, total, loading, error } = useIncidents(filters);
 
