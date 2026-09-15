@@ -5,10 +5,14 @@ import { FilterPanel } from "../components/map/FilterPanel";
 import { IncidentPreviewModal } from "../components/map/IncidentPreviewModal";
 import { useIncidents } from "../hooks/useIncidents";
 import { useWebSocketIncidents } from "../hooks/useWebSocketIncidents";
+import { isoDateDaysAgo } from "../lib/formatters";
 import type { Incident, IncidentFilters } from "../lib/types";
 
 export function MapPage() {
-  const [filters, setFilters] = useState<IncidentFilters>({ limit: 500 });
+  const [filters, setFilters] = useState<IncidentFilters>({
+    limit: 500,
+    date_from: isoDateDaysAgo(1),
+  });
   const { incidents, prependIncident } = useIncidents(filters);
   const [selected, setSelected] = useState<Incident | null>(null);
 

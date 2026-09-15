@@ -32,8 +32,8 @@ export function FilterPanel({ filters, onChange, variant = "overlay" }: FilterPa
 
   // Slider position increases left-to-right toward "today", so it reads
   // left (further back) -> right (present) like a timeline. Unset date_from
-  // defaults to the rightmost position (today) rather than the oldest end.
-  const daysAgo = filters.date_from ? daysAgoFromIsoDate(filters.date_from, MAX_SLIDER_DAYS) : 0;
+  // defaults to yesterday rather than the oldest end.
+  const daysAgo = filters.date_from ? daysAgoFromIsoDate(filters.date_from, MAX_SLIDER_DAYS) : 1;
   const sliderValue = MAX_SLIDER_DAYS - daysAgo;
 
   function setDateFromDaysAgo(sliderPos: number) {
@@ -86,7 +86,7 @@ export function FilterPanel({ filters, onChange, variant = "overlay" }: FilterPa
           <span className="normal-case text-gray-300">
             {filters.date_from
               ? new Date(`${filters.date_from}T00:00:00`).toLocaleDateString()
-              : "Today"}
+              : "Yesterday"}
           </span>
         </label>
         <input
