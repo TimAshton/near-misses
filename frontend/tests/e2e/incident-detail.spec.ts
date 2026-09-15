@@ -27,3 +27,22 @@ test("incident detail page shows normalized fields, raw data, and source link", 
 
   await expect(page.getByRole("link", { name: /View original source/ })).toBeVisible();
 });
+
+test("hurricane incidents show a satellite image panel", async ({ page }) => {
+  await page.goto("/reports");
+  await page.getByTestId("filter-category").selectOption("hurricane");
+
+  const firstRow = page.getByTestId("incident-row").first();
+  // Best-effort: whether an active/past storm made it into this environment's
+  // live-sourced data depends on real-world weather, so skip quietly if none.
+  try {
+    await expect(firstRow).toBeVisible({ timeout: 5000 });
+  } catch {
+    test.skip();
+    return;
+  }
+
+  await firstRow.getByRole("link", { name: "View" }).click();
+  await expect(page).toHaveURL(/\/incidents\//);
+  await expect(page.getByTestId("incident-satellite-image")).toBeVisible();
+});

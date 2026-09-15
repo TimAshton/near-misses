@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { LocationPreviewMap } from "../components/map/LocationPreviewMap";
+import { StormSatelliteImage } from "../components/map/StormSatelliteImage";
 import { PageShell } from "../components/layout/PageShell";
 import { fetchIncident } from "../lib/api";
 import type { Incident } from "../lib/types";
@@ -96,6 +97,18 @@ export function IncidentDetail() {
         </div>
 
         <div className="col-span-1 space-y-2">
+          {incident.category === "hurricane" && (
+            <>
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                Satellite
+              </h2>
+              <StormSatelliteImage
+                lat={incident.location.lat}
+                lng={incident.location.lng}
+                occurredAt={incident.occurred_at}
+              />
+            </>
+          )}
           <div
             data-testid="incident-pin-map"
             className="h-64 w-full overflow-hidden rounded-lg border border-gray-800"
