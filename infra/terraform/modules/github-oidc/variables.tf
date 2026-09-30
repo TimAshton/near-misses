@@ -51,3 +51,23 @@ variable "cloudfront_distribution_arn" {
 variable "ecs_service_arn" {
   type = string
 }
+
+variable "ecs_cluster_arn" {
+  description = "Cluster the migration RunTask is scoped to run in (via the ecs:cluster condition)"
+  type        = string
+}
+
+variable "ecs_task_definition_family_arn" {
+  description = "Revision-less task-definition ARN (\"...:family:*\") the migration RunTask is allowed to launch"
+  type        = string
+}
+
+variable "ecs_execution_role_arn" {
+  description = "Task execution role RunTask must be allowed to pass (same one the service's task definition already uses)"
+  type        = string
+}
+
+variable "ecs_task_role_arn" {
+  description = "Task role RunTask must be allowed to pass (same one the service's task definition already uses)"
+  type        = string
+}

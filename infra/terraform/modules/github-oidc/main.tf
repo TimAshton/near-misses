@@ -110,13 +110,50 @@ data "aws_iam_policy_document" "deploy" {
   }
 
   # ECS: roll the API service onto the new :latest image. No
-  # RegisterTaskDefinition/PassRole here — the task definition's image tag
-  # stays "latest" (mutable ECR tag), so a force-new-deployment is enough to
+  # RegisterTaskDefinition here — the task definition's image tag stays
+  # "latest" (mutable ECR tag), so a force-new-deployment is enough to
   # pick up a freshly pushed image without touching the task definition.
   statement {
     sid       = "EcsDeploy"
     actions   = ["ecs:UpdateService", "ecs:DescribeServices"]
     resources = [var.ecs_service_arn]
+  }
+
+  # ECS: run `alembic upgrade head` as a one-off task (same task definition
+  # and image the service uses, command overridden) before rolling the
+  # service — see the "Run DB migration" step in deploy.yml. RunTask also
+  # needs network info (subnets/security group), read via
+  # ecs:DescribeServices above rather than a separate permission.
+  statement {
+    sid       = "EcsRunMigrationTask"
+    actions   = ["ecs:RunTask"]
+    resources = [var.ecs_task_definition_family_arn]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values   = [var.ecs_cluster_arn]
+    }
+  }
+
+  statement {
+    sid       = "EcsDescribeMigrationTask"
+    actions   = ["ecs:DescribeTasks"]
+    resources = ["*"]
+
+    condition {
+      test     = "ArnEquals"
+      variable = "ecs:cluster"
+      values   = [var.ecs_cluster_arn]
+    }
+  }
+
+  # RunTask needs to pass both roles the task definition references, even
+  # though it's reusing an existing (not newly registered) task definition.
+  statement {
+    sid       = "PassEcsRoles"
+    actions   = ["iam:PassRole"]
+    resources = [var.ecs_execution_role_arn, var.ecs_task_role_arn]
   }
 }
 

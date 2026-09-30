@@ -93,6 +93,7 @@ resource "aws_ecs_task_definition" "api" {
 }
 
 data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
 
 resource "aws_ecs_service" "api" {
   name            = "${var.name}-api"

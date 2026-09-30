@@ -85,6 +85,51 @@ jobs:
           docker build -t "$REGISTRY/$REPOSITORY:$SHA" -t "$REGISTRY/$REPOSITORY:latest" .
           docker push "$REGISTRY/$REPOSITORY:$SHA"
           docker push "$REGISTRY/$REPOSITORY:latest"
+      - name: Run DB migration
+        # Runs `alembic upgrade head` as a one-off Fargate task, reusing the
+        # service's own task definition (same image/env/secrets) with the
+        # container command overridden, in the same private subnets/security
+        # group the running service uses (read from DescribeServices rather
+        # than duplicated into a repo variable). Gates the service roll below
+        # — a migration that fails must not go on to ship code that expects
+        # a schema that isn't there.
+        #
+        # ECS_SERVICE doubles as the task-definition family name here: both
+        # are named "${name}-api" by the Terraform (modules/ecs/main.tf), so
+        # there's deliberately no separate variable for it.
+        env:
+          CLUSTER: ${{ vars.ECS_CLUSTER }}
+          TASK_FAMILY: ${{ vars.ECS_SERVICE }}
+        run: |
+          set -euo pipefail
+
+          NETWORK_CONFIG=$(aws ecs describe-services \
+            --cluster "$CLUSTER" \
+            --services "$TASK_FAMILY" \
+            --query 'services[0].networkConfiguration' --output json)
+
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "$CLUSTER" \
+            --task-definition "$TASK_FAMILY" \
+            --launch-type FARGATE \
+            --network-configuration "$NETWORK_CONFIG" \
+            --overrides '{"containerOverrides":[{"name":"api","command":["alembic","upgrade","head"]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+
+          echo "Migration task: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster "$CLUSTER" --tasks "$TASK_ARN"
+
+          EXIT_CODE=$(aws ecs describe-tasks \
+            --cluster "$CLUSTER" \
+            --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+
+          if [ "$EXIT_CODE" != "0" ]; then
+            echo "Migration failed (exit code $EXIT_CODE) — see CloudWatch Logs group /ecs/${TASK_FAMILY}, stream prefix api."
+            exit 1
+          fi
+          echo "Migration applied successfully."
+
       - name: Roll ECS service onto the new image
         run: |
           aws ecs update-service \

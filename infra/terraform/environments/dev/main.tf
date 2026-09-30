@@ -170,12 +170,16 @@ module "ecs" {
 module "github_oidc" {
   source = "../../modules/github-oidc"
 
-  name                        = local.name
-  github_repo                 = var.github_repo
-  github_repository_id        = var.github_repository_id
-  github_repository_owner_id  = var.github_repository_owner_id
-  ecr_repository_arn          = module.ecr.repository_arn
-  s3_bucket_arn               = module.frontend_hosting.bucket_arn
-  cloudfront_distribution_arn = module.frontend_hosting.distribution_arn
-  ecs_service_arn             = "arn:aws:ecs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:service/${module.ecs.cluster_name}/${module.ecs.service_name}"
+  name                           = local.name
+  github_repo                    = var.github_repo
+  github_repository_id           = var.github_repository_id
+  github_repository_owner_id     = var.github_repository_owner_id
+  ecr_repository_arn             = module.ecr.repository_arn
+  s3_bucket_arn                  = module.frontend_hosting.bucket_arn
+  cloudfront_distribution_arn    = module.frontend_hosting.distribution_arn
+  ecs_service_arn                = "arn:aws:ecs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:service/${module.ecs.cluster_name}/${module.ecs.service_name}"
+  ecs_cluster_arn                = module.ecs.cluster_arn
+  ecs_task_definition_family_arn = module.ecs.task_definition_family_arn
+  ecs_execution_role_arn         = module.iam.execution_role_arn
+  ecs_task_role_arn              = module.iam.task_role_arn
 }
