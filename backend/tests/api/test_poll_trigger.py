@@ -1,38 +1,48 @@
 from unittest.mock import patch
 
+import pytest
+
 FIXTURE_RECORDS = [
     {
-        "NtsbNumber": "CEN24LA123",
+        "NtsbNo": "CEN24LA123",
         "EventType": "Accident",
         "EventDate": "2024-03-14T18:42:00Z",
         "Mode": "Aviation",
         "City": "Georgetown",
-        "State": "TX",
-        "Latitude": 30.6333,
-        "Longitude": -97.6772,
-        "AirportId": "KGTU",
-        "AirportName": "Georgetown Municipal Airport",
-        "AircraftMake": "Cessna",
-        "AircraftModel": "172S",
+        "State": "Texas",
+        "N#": "N172SP",
+        "VehicleMake": "Cessna",
+        "VehicleModel": "172S",
         "HighestInjuryLevel": "Minor",
-        "NarrativeBrief": "Test narrative.",
-        "ReportUrl": "https://www.ntsb.gov/investigations/AccidentReports/Pages/CEN24LA123.aspx",
     },
     {
-        # Non-US coordinate — should be rejected, not persisted.
-        "NtsbNumber": "FOREIGN-1",
+        # Geocodes outside the US (mocked below) — should be rejected, not persisted.
+        "NtsbNo": "FOREIGN-1",
         "EventType": "Accident",
         "EventDate": "2024-03-15T10:00:00Z",
         "Mode": "Aviation",
         "City": "London",
-        "State": None,
-        "Latitude": 51.5074,
-        "Longitude": -0.1278,
+        "State": "England",
         "HighestInjuryLevel": "None",
-        "NarrativeBrief": "",
-        "ReportUrl": None,
     },
 ]
+
+# The live NTSB feed carries City/State but no coordinates (see
+# ingestion/ntsb/README.md) — normalize() geocodes instead. Mocked here so
+# these tests never hit Nominatim or the geocode_cache table.
+_NTSB_GEOCODES = {
+    ("Georgetown", "Texas"): (30.6333, -97.6772),
+    ("London", "England"): (51.5074, -0.1278),
+}
+
+
+@pytest.fixture(autouse=True)
+def _mock_ntsb_geocoding():
+    with patch(
+        "near_misses.ingestion.ntsb.normalizer.geocode_city_state",
+        side_effect=lambda city, state: _NTSB_GEOCODES.get((city, state)),
+    ):
+        yield
 
 
 def test_trigger_poll_persists_new_incidents_and_skips_non_us(client, db_session):

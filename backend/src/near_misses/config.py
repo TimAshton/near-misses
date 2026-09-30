@@ -42,6 +42,10 @@ class Settings(BaseSettings):
         "WFIGS_Incident_Locations_Current/FeatureServer/0/query"
     )
     noaa_incidentnews_api_base: str = "https://incidentnews.noaa.gov/raw/incidents.csv"
+    # NTSB's live search results carry City/State but no coordinates (see
+    # ingestion/ntsb/README.md) — this fills in approximate lat/lng, cached
+    # in the geocode_cache table (see ingestion/geocode.py).
+    nominatim_api_base: str = "https://nominatim.openstreetmap.org/search"
 
     poll_interval_minutes: int = 5
     scheduler_enabled: bool = True

@@ -5,7 +5,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from near_misses.config import settings
 from near_misses.db import Base
-from near_misses.models import incident  # noqa: F401  (registers the table)
+from near_misses.models import geocode_cache, incident  # noqa: F401  (registers the tables)
 
 config = context.config
 # configparser treats "%" as interpolation syntax; the URL-encoded DB

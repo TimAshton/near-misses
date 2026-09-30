@@ -1,45 +1,53 @@
-# NTSB CAROL API — access spike notes
+# NTSB CAROL API — live query notes
 
-Resolved as the Phase 1 primary data source (see repo root `PLAN.md` and
-`ingestion/faa_aids/README.md` for why FAA AIDS/ASIAS was ruled out).
+**Status: live.** `NtsbClient()` defaults to `mode="live"` and hits the real
+endpoint on every poll. `mode="fixture"` (returning
+`backend/tests/fixtures/ntsb_sample.json`) still exists for offline tests.
 
-**Endpoint**: `POST https://data.ntsb.gov/carol-main-public/api/Query/Main`
-(confirmed reachable — `GET` returns `405`, so it's a real, live, unauthenticated
-JSON API backing the public CAROL search UI at ntsb.gov).
+**Endpoint**: `POST https://data.ntsb.gov/carol-main-public/api/Query/Main`.
 
-**Status: query body schema not fully reverse-engineered.** The endpoint expects
-a JSON body shaped roughly like:
+**The schema, solved**: the original spike (see git history) got
+`{"Error":"The Query AndOr value {0} is null"}` on every attempt because it
+was missing an `AndOr` key at both the query-group level and the top level.
+Once those are added, two more requirements surface one at a time as you fix
+them — `Columns` must be the dotted form (`"Event.Mode"`, not `"Mode"`), and
+the endpoint needs **both** `"ExportFormat": "data"` and a `"SessionId"` —
+omit either and it falls through to a generic, undiagnosable
+`"An unknown exception occured"` 500. `SessionId` also 500s if it's
+literally `0` or `1` (looks like it's used as an array index or divisor
+server-side) — any other int is fine, so `client.py` uses a random one each
+request rather than a fixed value. None of this is documented anywhere;
+found entirely by testing against the live endpoint. `client.py`'s
+`_query()` payload has the full working shape. Sorting newest-first uses `"SortDescending": true`;
+a `SortColumn`/`SortOrder` pair (what the original spike tried) isn't a
+field this endpoint accepts and also 500s.
 
-```json
-{
-  "ResultSetSize": 5,
-  "ResultSetOffset": 0,
-  "QueryGroups": [{"QueryRules": [{"RuleType": "Simple", "Values": ["Aviation"], "Columns": ["Mode"], "Operator": "is"}]}],
-  "SortColumn": "EventDate",
-  "SortOrder": "desc"
-}
-```
+The response is a results grid, not a flat object — each record is
+`{"Fields": [{"FieldName", "Values": [...]}, ...], "EntryId": ...}`.
+`client._flatten()` collapses that into a plain dict keyed by `FieldName`
+before handing records to the normalizer.
 
-but every variation tried during the time-boxed spike (adding `AndOr`/`QueryAndOr`
-at various nesting levels) returned `{"Error":"The Query AndOr value {0} is null"}}`
-— an unrendered template string, suggesting the real schema needs a field this
-spike didn't find (undocumented API; no public schema/OpenAPI spec exists). The
-CAROL web UI itself (https://www.ntsb.gov/Pages/AviationQueryV2.aspx) presumably
-issues a working request — capturing that via browser devtools/network tab would
-be the fastest way to get the exact schema, but browser automation wasn't
-available in this environment during the spike.
+**The bigger catch: no coordinates.** The live search grid's fixed column
+set (`NtsbNo`, `EventDate`, `City`, `State`, `VehicleMake`, `VehicleModel`,
+`HighestInjuryLevel`, ...) has no `Latitude`/`Longitude`, no airport, and no
+narrative — unlike the original hand-authored fixture, which had all of
+those because it was never actually shaped like a real response. Passing an
+explicit `Columns` list in the request to ask for more fields just 500s, and
+the only other NTSB reverse-engineering effort found (a GitHub proxy around
+the `FileExport` endpoint) only streams raw case-docket ZIPs, which don't
+obviously carry structured coordinates either.
 
-**What this means for the code**: `client.py`'s `_query()` method isolates the
-single HTTP call so fixing the payload is a one-method change once the real
-schema is confirmed. Until then, `NtsbClient.fetch()` defaults to
-`mode="fixture"`, returning the bundled sample record from
-`backend/tests/fixtures/ntsb_sample.json` so the rest of the pipeline
-(normalize → dedup → persist → archive → broadcast) is fully buildable and
-testable today. Set `mode="live"` (or fix `_query` and flip the default) once
-the schema is solved.
+**Resolution**: `normalizer.py` geocodes `City` + `State` via OpenStreetMap
+Nominatim (`ingestion/geocode.py`) to get an approximate lat/lng — city-
+center precision, not the exact accident site. Results are cached in the
+`geocode_cache` table so a poll that re-fetches the same recent records every
+5 minutes doesn't re-hit Nominatim for the same city/state pair, keeping
+well under its 1 req/sec free-tier usage policy. A record whose city/state
+can't be geocoded is dropped (caught and logged by the pipeline) rather than
+stored with no location, since `Location.lat`/`lng` are required.
 
-**TODO before relying on this in production**: solve the query schema, verify
-rate limits/auth requirements (none observed so far — no API key needed), and
-confirm update cadence (NTSB accident records are investigation-driven and can
-lag the real-world event by weeks to months — this must be disclosed on the
-`/about` page, not hidden behind the 5-minute poll interval).
+**Reporting lag**: unlike the FRA rail feed (1-2 months), NTSB's preliminary
+listing for an event shows up fast — verified live results included records
+from 2-3 days before the check date. Full investigation writeups (narrative,
+cause, docket) still lag by weeks to months, but that's a completeness gap
+in the record, not a delay in the record existing.

@@ -1,4 +1,5 @@
 import json
+import random
 from pathlib import Path
 from typing import Any, Literal
 
@@ -9,18 +10,25 @@ from near_misses.config import settings
 _FIXTURE_PATH = Path(__file__).resolve().parents[4] / "tests" / "fixtures" / "ntsb_sample.json"
 
 
-class NtsbClient:
-    """Client for NTSB's CAROL accident/incident data.
-
-    See ./README.md — the live query schema is not yet fully solved, so this
-    defaults to fixture mode. `_query()` is the single isolated HTTP call to
-    fix once the real schema is confirmed (e.g. by capturing a real request
-    from https://www.ntsb.gov/Pages/AviationQueryV2.aspx).
+def _flatten(result: dict[str, Any]) -> dict[str, Any]:
+    """Query/Main's result shape is a grid row: a list of {FieldName, Values}
+    entries rather than a flat object. Collapse each field to its first value
+    (these columns are all single-valued) so the rest of the pipeline can
+    treat NTSB records like every other source's plain dicts.
     """
+    flat: dict[str, Any] = {}
+    for field in result.get("Fields", []):
+        values = field.get("Values") or []
+        flat[field["FieldName"]] = values[0] if values else None
+    return flat
+
+
+class NtsbClient:
+    """Client for NTSB's CAROL accident/incident data (see ./README.md)."""
 
     source_name = "ntsb"
 
-    def __init__(self, mode: Literal["live", "fixture"] = "fixture") -> None:
+    def __init__(self, mode: Literal["live", "fixture"] = "live") -> None:
         self.mode = mode
 
     def fetch(self) -> list[dict[str, Any]]:
@@ -30,24 +38,40 @@ class NtsbClient:
 
     def _query(self) -> list[dict[str, Any]]:
         payload = {
-            "ResultSetSize": 25,
-            "ResultSetOffset": 0,
             "QueryGroups": [
                 {
                     "QueryRules": [
                         {
                             "RuleType": "Simple",
                             "Values": ["Aviation"],
-                            "Columns": ["Mode"],
+                            "Columns": ["Event.Mode"],
                             "Operator": "is",
                         }
                     ],
+                    "AndOr": "and",
                 }
             ],
-            "SortColumn": "EventDate",
-            "SortOrder": "desc",
+            "AndOr": "and",
+            "TargetCollection": "cases",
+            "ResultSetSize": 50,
+            "ResultSetOffset": 0,
+            "SortDescending": True,
+            # Both required, even for a plain JSON query with no export in
+            # mind — omitting either gets back a generic 500 "An unknown
+            # exception occured" with no further detail. Found by testing
+            # directly against the live endpoint; see README.md. SessionId
+            # additionally 500s if it's 0 or 1 specifically (looks like it's
+            # used as an array index or divisor server-side) — any other
+            # int works, so a random one sidesteps that edge case entirely.
+            "ExportFormat": "data",
+            "SessionId": random.randint(1000, 999999),
         }
-        response = httpx.post(settings.ntsb_api_base, json=payload, timeout=15)
+        response = httpx.post(
+            settings.ntsb_api_base,
+            json=payload,
+            headers={"Origin": "https://data.ntsb.gov", "User-Agent": settings.nws_user_agent},
+            timeout=15,
+        )
         response.raise_for_status()
         data = response.json()
-        return data.get("Results", data if isinstance(data, list) else [])
+        return [_flatten(result) for result in data.get("Results", [])]
